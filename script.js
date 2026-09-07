@@ -57,8 +57,29 @@
       el.appendChild(s);
     });
   }
-  $$(".intro__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.9 + i * 0.5}s`));
+  $$(".intro__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.5 + i * 0.45}s`));
+  $("#seal-text").innerHTML = `${(CFG.groom || "")[0] || ""}<i>&amp;</i>${(CFG.bride || "")[0] || ""}`;
+  // Календарга кошуу / Добавить в календарь (Google Calendar)
+  (function calendarLink() {
+    const a = $("#cal-btn"); if (!a) return;
+    const [eh, em] = (CFG.timeEnd || "23:00").split(":").map(Number);
+    const f = (d) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+    const end = new Date(Y, M - 1, D, eh, em, 0);
+    const p = new URLSearchParams({ action: "TEMPLATE", text: `${CFG.groom} & ${CFG.bride} — үйлөнүү той`, dates: `${f(eventDate)}/${f(end)}`, details: location.href, location: values.addressLine ? `${CFG.venueName}, ${values.addressLine}` : CFG.venueName || "" });
+    a.href = `https://calendar.google.com/calendar/render?${p}`;
+  })();
   $$(".hero__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.4 + i * 0.6}s`));
+  $$(".hosts__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.3 + i * 0.5}s`));
+
+  /* ---------- Сөз-сөз / Появление текста по словам ---------- */
+  function splitWords(el) {
+    const words = el.textContent.trim().split(/\s+/); el.textContent = "";
+    words.forEach((w, i) => { const s = document.createElement("span"); s.className = "word"; s.style.setProperty("--w", i); s.textContent = w; el.appendChild(s); el.appendChild(document.createTextNode(" ")); });
+  }
+  $$('.lead[data-cfg="inviteText"], .hosts__text, .footer__text').forEach(splitWords);
+  // Веточка-разделитель над каждой секцией
+  const DIVIDER = '<path d="M4 16 C 50 4, 90 26, 130 15 S 210 4, 256 16"/><path d="M60 13 c -6 -8 -4 -14 4 -16 c 2 8 0 13 -4 16 Z"/><path d="M118 17 c 6 6 4 13 -3 15 c -2 -7 0 -12 3 -15 Z"/><path d="M186 12 c -6 -8 -4 -14 4 -16 c 2 8 0 13 -4 16 Z"/><path d="M130 15 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0"/>';
+  $$(".section .container.reveal").forEach((c) => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("class", "divider"); s.setAttribute("viewBox", "0 0 260 28"); s.innerHTML = DIVIDER; c.insertBefore(s, c.firstChild); });
   $$(".reveal").forEach((r) => Array.from(r.children).forEach((c, i) => c.style.setProperty("--n", i)));
 
   /* ---------- Параллакс, боке, наклон, волна ---------- */
@@ -67,7 +88,11 @@
   let syTick = false;
   addEventListener("scroll", () => {
     if (syTick) return; syTick = true;
-    requestAnimationFrame(() => { document.documentElement.style.setProperty("--sy", Math.min(scrollY, 900)); syTick = false; });
+    requestAnimationFrame(() => {
+      document.documentElement.style.setProperty("--sy", Math.min(scrollY, 900));
+      document.documentElement.style.setProperty("--sp", (scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)).toFixed(4));
+      syTick = false;
+    });
   }, { passive: true });
   if (window.matchMedia("(hover: hover)").matches) {
     $$(".note, .countdown__item").forEach((card) => {
@@ -205,13 +230,15 @@
   const stopDust = startDust();
   // Ачуу: сыдыруу, чыйратуу, баскыч же басуу / Открытие: свайп, колесо, клавиша или клик
   const intro = $("#intro");
+  const env = $("#env");
   function openInvite() {
-    if (intro.classList.contains("is-opening")) return;
-    intro.classList.add("is-opening");
+    if (env.classList.contains("is-open")) return;
+    env.classList.add("is-open"); // 1) печать → клапан → карточка выезжает
     play();
-    setTimeout(() => { document.body.classList.remove("locked"); document.body.classList.add("opened"); startPetals(); }, 450);
-    setTimeout(() => { musicBtn.classList.add("is-visible"); }, 1400);
-    setTimeout(() => { intro.classList.add("is-hidden"); stopDust(); }, 1900);
+    setTimeout(() => intro.classList.add("is-opening"), 1500); // 2) занавес
+    setTimeout(() => { document.body.classList.remove("locked"); document.body.classList.add("opened"); startPetals(); }, 1950);
+    setTimeout(() => { musicBtn.classList.add("is-visible"); }, 2900);
+    setTimeout(() => { intro.classList.add("is-hidden"); stopDust(); }, 3400);
     removeEventListener("wheel", onWheel); removeEventListener("keydown", onKey);
   }
   const onWheel = (e) => { if (e.deltaY > 0) openInvite(); };
@@ -276,8 +303,20 @@
     }
     for (let i = 0; i < N; i++) petals.push(make(true));
     let wind = 0; addEventListener("scroll", () => { wind = Math.min(3, wind + 0.3); }, { passive: true });
+    // Алтын учкундар / Вспышка золотых искр
+    const sparks = [];
+    window.__burst = (cx = W / 2, cy = H / 2, n = 70) => {
+      for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, v = (2 + Math.random() * 6) * dpr; sparks.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.5 * dpr, life: 1, r: (1 + Math.random() * 2) * dpr, gold: Math.random() < .7 }); }
+    };
+    setTimeout(() => window.__burst(), 200);
     function draw() {
       ctx.clearRect(0, 0, W, H); wind *= 0.95;
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.vy += 0.06 * dpr; s.vx *= 0.97; s.vy *= 0.97; s.life -= 0.014;
+        if (s.life <= 0) { sparks.splice(i, 1); continue; }
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * s.life, 0, Math.PI * 2);
+        ctx.fillStyle = s.gold ? `rgba(201,175,120,${s.life})` : `rgba(209,149,158,${s.life})`; ctx.fill();
+      }
       petals.forEach((p) => {
         p.sway += 0.02 + wind * 0.01; p.y += p.vy * (1 + wind); p.x += p.vx + Math.sin(p.sway) * (0.4 + wind * 0.3) * dpr; p.a += p.va * (1 + wind);
         if (p.y > H + 30 || p.x < -40 || p.x > W + 40) Object.assign(p, make(false));
@@ -328,6 +367,7 @@
     showSuccess();
   });
   function showSuccess() {
+    if (window.__burst) { const r = $("#rsvp").getBoundingClientRect(); window.__burst(innerWidth / 2 * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), Math.min(innerHeight, Math.max(0, r.top + 200)) * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), 90); }
     form.hidden = true;
     const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
   }

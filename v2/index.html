@@ -28,6 +28,13 @@
         <text id="tr-bride" class="tr tr--2" x="320" y="192">Сонунбубу</text>
       </svg>
       <p class="intro__date"><span data-cfg="dateLong">10-сентябрь 2026-жыл</span></p>
+      <svg class="postmark" viewBox="0 0 120 120" aria-hidden="true">
+        <defs><path id="pm-arc" d="M60 60 m -41 0 a 41 41 0 1 1 82 0 a 41 41 0 1 1 -82 0"/></defs>
+        <circle cx="60" cy="60" r="54"/><circle cx="60" cy="60" r="31"/>
+        <text class="postmark__ring"><textPath id="pm-text" href="#pm-arc" startOffset="0">ЭРНИС ✦ СОНУНБУБУ ✦ 10.09.2026 ✦</textPath></text>
+        <text class="postmark__center" x="60" y="58">ТОЙ</text>
+        <text class="postmark__center postmark__center--small" x="60" y="72" id="pm-year">2026</text>
+      </svg>
       <button id="open-btn" class="intro__scroll" type="button" aria-label="Чакырууну ачуу">
         <span class="intro__chev"></span><span class="intro__chev"></span><span class="intro__chev"></span>
       </button>
@@ -40,6 +47,7 @@
   </button>
   <audio id="bg-music" loop preload="auto"></audio>
 
+  <div class="progress" aria-hidden="true"></div>
   <main id="page" class="page">
     <svg id="route" class="route" aria-hidden="true"></svg>
 
@@ -88,6 +96,7 @@
         <div id="calendar" class="cal fade"></div>
         <p class="note-line fade">Той <strong data-cfg="timeStart">17:00</strong> — <strong data-cfg="timeEnd">23:00</strong></p>
         <p class="hint fade">Той убактысынан кечикпеңиздер!</p>
+        <a id="cal-btn" class="btn btn--line btn--small fade" href="#" target="_blank" rel="noopener"><span>Календарга кошуу</span></a>
       </div>
     </section>
 
@@ -97,10 +106,10 @@
         <p class="kicker">Тойго чейин</p>
         <h2 class="title">Калды</h2>
         <div id="countdown" class="cd-row fade" aria-live="polite">
-          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46"/></svg><span class="cd__num" data-unit="days">00</span><span class="cd__label">күн</span></div>
-          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46"/></svg><span class="cd__num" data-unit="hours">00</span><span class="cd__label">саат</span></div>
-          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46"/></svg><span class="cd__num" data-unit="minutes">00</span><span class="cd__label">мүнөт</span></div>
-          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46"/></svg><span class="cd__num" data-unit="seconds">00</span><span class="cd__label">секунд</span></div>
+          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"/></svg><span class="cd__num" data-unit="days">00</span><span class="cd__label">күн</span></div>
+          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"/></svg><span class="cd__num" data-unit="hours">00</span><span class="cd__label">саат</span></div>
+          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"/></svg><span class="cd__num" data-unit="minutes">00</span><span class="cd__label">мүнөт</span></div>
+          <div class="cd"><svg viewBox="0 0 100 100"><circle class="ring" cx="50" cy="50" r="46" transform="rotate(-90 50 50)"/></svg><span class="cd__num" data-unit="seconds">00</span><span class="cd__label">секунд</span></div>
         </div>
       </div>
     </section>

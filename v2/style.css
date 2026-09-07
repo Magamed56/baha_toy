@@ -63,7 +63,7 @@ a { color: inherit; }
   background: rgba(249,245,236,.92); text-align: center; color: var(--ink);
   opacity: 0; transform: translateY(16px); animation: cartIn 1s var(--ease) .8s forwards;
 }
-@keyframes cartIn { to { opacity: 1; transform: none; } }
+@keyframes cartIn { 0% { opacity: 0; transform: scale(1.3) rotate(-4deg); } 55% { opacity: 1; transform: scale(.96) rotate(.6deg); } 75% { transform: scale(1.02) rotate(-.2deg); } 100% { opacity: 1; transform: none; } }
 .cartouche__frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .cartouche__frame rect { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; }
 .intro__kicker { font-size: .78rem; letter-spacing: .38em; text-transform: uppercase; color: var(--sepia); margin-bottom: .6rem; opacity: 0; animation: fadeIn 1s ease 1.4s forwards; }
@@ -86,7 +86,15 @@ a { color: inherit; }
 .intro__chev:nth-child(2) { animation-delay: .2s; } .intro__chev:nth-child(3) { animation-delay: .4s; }
 @keyframes chev { 0% { opacity: 0; transform: rotate(45deg) translate(-5px, -5px); } 50% { opacity: 1; } 100% { opacity: 0; transform: rotate(45deg) translate(5px, 5px); } }
 .intro__hint { margin-top: .5rem; font-size: .82rem; color: var(--ink-soft); letter-spacing: .1em; opacity: 0; animation: fadeIn 1s ease 4.6s forwards; }
-.intro:not(.is-ready) :is(.cartouche, .intro__kicker, .tr, .intro__date, .intro__scroll, .intro__hint) { animation-play-state: paused; }
+.postmark { position: absolute; top: -26px; right: -18px; width: clamp(88px, 24vw, 120px); color: #8c5b5b; opacity: 0; transform: rotate(-14deg) scale(1.7); animation: stamp .55s cubic-bezier(.3,1.4,.5,1) 3.4s forwards; mix-blend-mode: multiply; pointer-events: none; }
+.postmark circle { fill: none; stroke: currentColor; stroke-width: 2; }
+.postmark circle:first-of-type { stroke-dasharray: 3 2.5; }
+.postmark__ring { font-family: var(--serif); font-size: 10.5px; letter-spacing: .12em; font-weight: 600; fill: currentColor; }
+.postmark__center { font-family: var(--display); font-size: 15px; letter-spacing: .1em; fill: currentColor; text-anchor: middle; font-weight: 600; }
+.postmark__center--small { font-size: 10px; letter-spacing: .2em; }
+@keyframes stamp { 0% { opacity: 0; transform: rotate(-14deg) scale(1.7); } 70% { opacity: .9; transform: rotate(-14deg) scale(.96); } 100% { opacity: .82; transform: rotate(-14deg) scale(1); } }
+.intro:not(.is-ready) :is(.cartouche, .intro__kicker, .tr, .intro__date, .intro__scroll, .intro__hint, .postmark) { animation-play-state: paused; }
+.btn--small { padding: .7rem 1.6rem; font-size: .9rem; margin-top: 1.2rem; }
 
 /* ---------- Музыка ---------- */
 .music-btn {
@@ -196,8 +204,11 @@ a { color: inherit; }
 .cd svg { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--sepia); overflow: visible; }
 .cd .ring { fill: none; stroke: currentColor; stroke-width: 1.2; }
 .cd__num { font-family: var(--display); font-size: clamp(1.6rem, 6vw, 2.6rem); line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
-.cd__num.tick { animation: tick .5s; }
-@keyframes tick { 0% { transform: translateY(-6px); opacity: .3; } 100% { transform: none; opacity: 1; } }
+.cd { perspective: 400px; }
+.cd__num.tick { animation: flip .55s cubic-bezier(.2,.8,.2,1); transform-origin: 50% 60%; }
+@keyframes flip { 0% { transform: rotateX(-90deg); opacity: 0; } 60% { transform: rotateX(12deg); opacity: 1; } 100% { transform: none; } }
+.cd .ring { transition: stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1); }
+.cd .ring--track { fill: none; stroke: currentColor; stroke-width: 1.2; opacity: .18; }
 .cd__label { display: block; margin-top: .3rem; font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--sepia); }
 .cd--done { font-family: var(--script); font-size: 2.4rem; color: var(--sepia); }
 
@@ -279,3 +290,10 @@ a { color: inherit; }
 /* Заметнее: рисунки темнее */
 .compass, .mountains, .yurt, .underline { color: var(--ink-soft); }
 .mountains .snow { opacity: .9; }
+
+/* ===== Ещё анимации ===== */
+.word { display: inline-block; opacity: 0; transform: translateY(.4em); transition: opacity .6s var(--ease), transform .6s var(--ease); transition-delay: calc(var(--w, 0) * 40ms + .4s); }
+.is-visible .word { opacity: 1; transform: none; }
+.progress { position: fixed; top: 0; left: 0; height: 2px; width: 100%; transform: scaleX(var(--sp, 0)); transform-origin: left; background: var(--ink-soft); z-index: 95; pointer-events: none; }
+.music-btn.is-playing::before { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid var(--sepia); animation: inkPulse2 2.2s ease-out infinite; }
+@keyframes inkPulse2 { 0% { transform: scale(.9); opacity: .9; } 100% { transform: scale(1.35); opacity: 0; } }

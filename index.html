@@ -21,7 +21,10 @@
     <div class="intro__panel intro__panel--l"></div>
     <div class="intro__panel intro__panel--r"></div>
     <canvas id="dust" class="intro__dust" aria-hidden="true"></canvas>
-    <div class="intro__card">
+    <div class="intro__stack">
+    <div class="env" id="env">
+      <div class="env__back"></div>
+      <div class="intro__card env__card">
       <svg class="intro__ornament" viewBox="0 0 200 40" aria-hidden="true">
         <path d="M5 20 C40 0, 70 40, 100 20 S160 0, 195 20" fill="none" stroke="currentColor" stroke-width="1"/>
         <circle cx="100" cy="20" r="3" fill="currentColor"/>
@@ -33,10 +36,15 @@
         <span data-cfg="bride">Сонунбубу</span>
       </h1>
       <p class="intro__date" data-cfg="dateLong">10-сентябрь 2026-жыл</p>
-      <button id="open-btn" class="intro__scroll" type="button" aria-label="Чакырууну ачуу">
-        <span class="intro__chev"></span><span class="intro__chev"></span><span class="intro__chev"></span>
-      </button>
+      </div>
+      <div class="env__front"></div>
+      <div class="env__flap"></div>
+      <button id="open-btn" class="env__seal" type="button" aria-label="Чакырууну ачуу"><span id="seal-text">Э<i>&amp;</i>С</span></button>
+    </div>
+    <div class="intro__bottom">
+      <span class="intro__chevs"><span class="intro__chev"></span><span class="intro__chev"></span><span class="intro__chev"></span></span>
       <p class="intro__hint">Төмөн сыдырыңыз · 🎵 музыка менен</p>
+    </div>
     </div>
   </div>
 
@@ -48,6 +56,7 @@
 
   <canvas id="petals" aria-hidden="true"></canvas>
 
+  <div class="progress" aria-hidden="true"></div>
   <main id="page" class="page">
 
     <!-- ===== Башкы экран ===== -->
@@ -121,6 +130,7 @@
         <div id="calendar" class="calendar" aria-label="Календарь"></div>
         <p class="section__note">Той <strong data-cfg="timeStart">17:00</strong> — <strong data-cfg="timeEnd">23:00</strong></p>
         <p class="section__hint">Той убактысынан кечикпеңиздер!</p>
+        <a id="cal-btn" class="btn btn--outline btn--small" href="#" target="_blank" rel="noopener"><span>📅 Календарга кошуу</span></a>
       </div>
     </section>
 

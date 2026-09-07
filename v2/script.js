@@ -43,7 +43,11 @@
   let syTick = false;
   addEventListener("scroll", () => {
     if (syTick) return; syTick = true;
-    requestAnimationFrame(() => { document.documentElement.style.setProperty("--sy", Math.min(scrollY, 900)); syTick = false; });
+    requestAnimationFrame(() => {
+      document.documentElement.style.setProperty("--sy", Math.min(scrollY, 900));
+      document.documentElement.style.setProperty("--sp", (scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)).toFixed(4));
+      syTick = false;
+    });
   }, { passive: true });
   $$(".btn").forEach((b) => b.addEventListener("pointerdown", (e) => {
     const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
@@ -53,7 +57,24 @@
   }));
   $("#tr-bride").textContent = CFG.bride || "";
   $("#hero-groom").textContent = CFG.groom || "";
+
+  /* ---------- Сөз-сөз / Появление текста по словам ---------- */
+  function splitWords(el) {
+    const words = el.textContent.trim().split(/\s+/); el.textContent = "";
+    words.forEach((w, i) => { const s = document.createElement("span"); s.className = "word"; s.style.setProperty("--w", i); s.textContent = w; el.appendChild(s); el.appendChild(document.createTextNode(" ")); });
+  }
+  $$('.lead[data-cfg="inviteText"], #hosts .sub, .footer__text').forEach(splitWords);
   $("#hero-bride").textContent = CFG.bride || "";
+  $("#pm-text").textContent = `${(CFG.groom || "").toUpperCase()} ✦ ${(CFG.bride || "").toUpperCase()} ✦ ${pad2(D)}.${pad2(M)}.${Y} ✦`;
+  $("#pm-year").textContent = String(Y);
+  (function calendarLink() {
+    const a = $("#cal-btn"); if (!a) return;
+    const [eh, em] = (CFG.timeEnd || "23:00").split(":").map(Number);
+    const f = (d) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+    const end = new Date(Y, M - 1, D, eh, em, 0);
+    const p = new URLSearchParams({ action: "TEMPLATE", text: `${CFG.groom} & ${CFG.bride} — үйлөнүү той`, dates: `${f(eventDate)}/${f(end)}`, details: location.href, location: values.addressLine ? `${CFG.venueName}, ${values.addressLine}` : CFG.venueName || "" });
+    a.href = `https://calendar.google.com/calendar/render?${p}`;
+  })();
 
   /* ---------- SVG жардамчылар ---------- */
   function el(name, attrs = {}, parent) {
@@ -92,7 +113,7 @@
     node.style.strokeDasharray = dashed ? dashedArray(len) : `${len}`;
     node.style.strokeDashoffset = len;
     if (REDUCED) { node.style.strokeDashoffset = 0; return; }
-    node.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration, delay, easing, fill: "forwards" });
+    return node.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration, delay, easing, fill: "forwards" });
   }
   function popIn(node, { delay = 0, duration = 600 } = {}) {
     node.style.transformBox = "fill-box"; node.style.transformOrigin = "center";
@@ -314,7 +335,12 @@
     function set(e, v) { const s = pad2(v); if (e.textContent !== s) { e.textContent = s; e.classList.remove("tick"); void e.offsetWidth; e.classList.add("tick"); } }
     let rolling = false;
     function parts() { const s = Math.max(0, Math.floor((eventDate - new Date()) / 1000)); return [Math.floor(s / 86400), Math.floor((s % 86400) / 3600), Math.floor((s % 3600) / 60), s % 60]; }
-    function show(v) { set(u.days, v[0]); set(u.hours, v[1]); set(u.minutes, v[2]); set(u.seconds, v[3]); }
+    const FRAC = { days: (v) => Math.min(1, v / 30), hours: (v) => v / 24, minutes: (v) => v / 60, seconds: (v) => v / 60 };
+    function liveRing(unit, v) {
+      const ring = u[unit].parentNode.querySelector(".ring"); if (!ring || !ring.dataset.live) return;
+      const len = Number(ring.dataset.len); ring.style.strokeDashoffset = len * (1 - FRAC[unit](v));
+    }
+    function show(v) { set(u.days, v[0]); set(u.hours, v[1]); set(u.minutes, v[2]); set(u.seconds, v[3]); liveRing("days", v[0]); liveRing("hours", v[1]); liveRing("minutes", v[2]); liveRing("seconds", v[3]); }
     function tick() {
       if (eventDate - new Date() <= 0) { box.innerHTML = '<div class="cd--done">Бул күн келди! ♥</div>'; return; }
       if (!rolling) show(parts());
@@ -350,11 +376,15 @@
     sec.classList.add("is-visible");
     frameDraw(sec);
     $$(".stroke", sec).forEach((p, i) => { drawIn(p, { duration: 1200, delay: 500 + i * 200 }); penAlong(p, { duration: 1200, delay: 500 + i * 200 }); });
-    $$(".ring", sec).forEach((c, i) => drawIn(c, { duration: 1200, delay: 500 + i * 200 }));
+    $$(".ring", sec).forEach((c, i) => {
+      if (!c.parentNode.querySelector(".ring--track")) { const t = c.cloneNode(false); t.setAttribute("class", "ring--track"); c.parentNode.insertBefore(t, c); }
+      delete c.dataset.live; const a = drawIn(c, { duration: 1200, delay: 500 + i * 200 });
+      if (a) a.onfinish = () => { a.cancel(); c.dataset.len = c.getTotalLength(); c.dataset.live = "1"; }; else { c.dataset.len = c.getTotalLength(); c.dataset.live = "1"; }
+    });
     $$(".ring2", sec).forEach((c) => drawIn(c, { duration: 1200, delay: 900 }));
     if (sec.id === "hero") { drawCompass($("#compass")).forEach((p, i) => drawIn(p, { duration: 1200, delay: 800 + i * 150 })); const ms = drawMountains($("#hero-mountains"), 3); ms.forEach((p, i) => drawIn(p, { duration: 1600, delay: 400 + i * 200 })); penAlong(ms[1], { duration: 1600, delay: 600 }); }
     if (sec.id === "countdown-sec" && window.__rollCountdown) setTimeout(window.__rollCountdown, 600);
-    if (sec.id === "hosts") drawYurt($("#yurt")).forEach((p, i) => drawIn(p, { duration: 900, delay: 700 + i * 160 }));
+    if (sec.id === "hosts") drawYurt($("#yurt")).forEach((p, i) => { drawIn(p, { duration: 900, delay: 700 + i * 160 }); if (i < 3) penAlong(p, { duration: 900, delay: 700 + i * 160 }); });
     if (sec.id === "end") drawMountains($("#footer-mountains"), 11).forEach((p, i) => drawIn(p, { duration: 1600, delay: 200 + i * 200 }));
   }
   // Ар бир жолу кайра тартылат / Рисуется заново при каждом возврате
