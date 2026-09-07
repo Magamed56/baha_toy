@@ -38,7 +38,22 @@
   $$("[data-cfg]").forEach((el) => { const v = values[el.dataset.cfg]; if (v) el.textContent = v; });
   document.title = `${CFG.groom} & ${CFG.bride} — Үйлөнүү той`;
   $("#tr-groom").textContent = CFG.groom || "";
+
+  /* ---------- Параллакс жана толкун ---------- */
+  let syTick = false;
+  addEventListener("scroll", () => {
+    if (syTick) return; syTick = true;
+    requestAnimationFrame(() => { document.documentElement.style.setProperty("--sy", Math.min(scrollY, 900)); syTick = false; });
+  }, { passive: true });
+  $$(".btn").forEach((b) => b.addEventListener("pointerdown", (e) => {
+    const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
+    const sp = document.createElement("span"); sp.className = "ripple";
+    sp.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+    b.appendChild(sp); setTimeout(() => sp.remove(), 800);
+  }));
   $("#tr-bride").textContent = CFG.bride || "";
+  $("#hero-groom").textContent = CFG.groom || "";
+  $("#hero-bride").textContent = CFG.bride || "";
 
   /* ---------- SVG жардамчылар ---------- */
   function el(name, attrs = {}, parent) {
@@ -47,7 +62,22 @@
     if (parent) parent.appendChild(e);
     return e;
   }
-  const LINE = { fill: "none", stroke: "currentColor", "stroke-width": 1.4, "stroke-linecap": "round", "stroke-linejoin": "round" };
+  const LINE = { fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round" };
+  // «Перо» бежит вдоль линии, пока она рисуется
+  function penAlong(node, { duration = 1200, delay = 0 } = {}) {
+    if (REDUCED || !node.getTotalLength) return;
+    const len = node.getTotalLength(); const svg = node.ownerSVGElement; if (!len || !svg) return;
+    const pen = el("circle", { r: 4, fill: "currentColor", opacity: 0 }, svg);
+    const parent = node.parentNode; if (parent !== svg && parent.getAttribute("transform")) parent.appendChild(pen);
+    setTimeout(() => {
+      const t0 = performance.now(); pen.setAttribute("opacity", 1);
+      (function step(now) {
+        const t = Math.min(1, (now - t0) / duration); const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const pt = node.getPointAtLength(len * e); pen.setAttribute("cx", pt.x); pen.setAttribute("cy", pt.y);
+        if (t < 1) requestAnimationFrame(step); else pen.remove();
+      })(t0);
+    }, delay);
+  }
   function seeded(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   function dashedArray(len, dash = 7, gap = 7) {
     // Схема: [dash gap dash gap … (сумма = len)] 0 len — при dashoffset = len линия невидима, при 0 — полностью пунктирная
@@ -91,7 +121,7 @@
     const back = el("path", { ...LINE, d: mountainPath(-30, W + 30, H * 0.78, H * 0.62, 10, rnd), opacity: .45 }, svg);
     const front = el("path", { ...LINE, d: mountainPath(-30, W + 30, H * 0.95, H * 0.55, 7, rnd) }, svg);
     // снежные шапки — короткие штрихи на пиках
-    const snow = el("g", { ...LINE, opacity: .7 }, svg);
+    const snow = el("g", { ...LINE, class: "snow", opacity: .7 }, svg);
     for (let i = 0; i < 4; i++) { const x = W * (0.12 + i * 0.24), y = H * 0.55 + rnd() * 10; el("path", { d: `M${x - 10} ${y + 8} l6 -6 l5 5 l6 -8 l5 4` }, snow); }
     const ground = el("path", { ...LINE, d: `M0 ${H - 1} H ${W}`, opacity: .5 }, svg);
     return [back, front, ...snow.children, ground];
@@ -137,7 +167,8 @@
     const mh = Math.min(H * 0.3, 260);
     const back = el("path", { ...LINE, d: mountainPath(-30, W + 30, H - mh * 0.25, mh * 0.75, mobile ? 6 : 12, rnd), opacity: .4 }, svg);
     const front = el("path", { ...LINE, d: mountainPath(-30, W + 30, H - 8, mh * 0.6, mobile ? 5 : 9, rnd) }, svg);
-    timeline.push([back, { duration: 1800, delay: 100 }], [front, { duration: 1800, delay: 400 }]);
+    timeline.push([back, { duration: 1500, delay: 100 }], [front, { duration: 1500, delay: 300 }]);
+    penAlong(front, { duration: 1500, delay: 300 });
 
     // Деревья и юрта у подножия
     const tg = el("g", { ...LINE }, svg);
@@ -161,7 +192,8 @@
     const A = [W * 0.1, H * 0.86], B = [W * 0.86, H * 0.16];
     const d = `M${A[0]} ${A[1]} C ${W * 0.35} ${H * 1.02}, ${W * 1.02} ${H * 0.9}, ${W * 0.95} ${H * 0.55} S ${W * 0.55} ${H * 0.28}, ${B[0]} ${B[1]}`;
     const route = el("path", { ...LINE, d, "stroke-width": 1.6 }, svg);
-    timeline.push([route, { duration: 2600, delay: 1200, dashed: true }]);
+    timeline.push([route, { duration: 2200, delay: 900, dashed: true }]);
+    penAlong(route, { duration: 2200, delay: 900 });
 
     // Пины и подписи
     const pinA = el("g", { ...LINE, fill: "var(--parch)" }, svg);
@@ -169,11 +201,11 @@
     const la = el("text", { x: A[0] + 20, y: A[1] - 12, "font-size": 15, fill: "currentColor", stroke: "none", "font-family": "Cormorant Garamond, serif", "font-style": "italic" }, svg); la.textContent = CFG.groom || "";
     const heart = el("path", { ...LINE, d: heartPath(B[0], B[1], 1.2), fill: "var(--parch)" }, svg);
     const lb = el("text", { x: B[0], y: B[1] + 30, "font-size": 15, "text-anchor": "middle", fill: "currentColor", stroke: "none", "font-family": "Cormorant Garamond, serif", "font-style": "italic" }, svg); lb.textContent = CFG.bride || "";
-    setTimeout(() => { popIn(pinA, { delay: 0 }); fadeIn(la, { delay: 300 }); }, 1100);
-    setTimeout(() => { drawIn(heart, { duration: 900 }); fadeIn(lb, { delay: 500 }); heart.animate([{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 1600, iterations: Infinity, delay: 1000 }); heart.style.transformBox = "fill-box"; heart.style.transformOrigin = "center"; }, 3700);
+    setTimeout(() => { popIn(pinA, { delay: 0 }); fadeIn(la, { delay: 300 }); }, 800);
+    setTimeout(() => { drawIn(heart, { duration: 900 }); fadeIn(lb, { delay: 500 }); heart.animate([{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 1600, iterations: Infinity, delay: 1000 }); heart.style.transformBox = "fill-box"; heart.style.transformOrigin = "center"; }, 3000);
     pinA.style.opacity = 0; la.style.opacity = 0; lb.style.opacity = 0;
-    setTimeout(() => { pinA.style.opacity = ""; la.style.opacity = ""; }, 1100);
-    setTimeout(() => { lb.style.opacity = ""; }, 3700);
+    setTimeout(() => { pinA.style.opacity = ""; la.style.opacity = ""; }, 800);
+    setTimeout(() => { lb.style.opacity = ""; }, 3000);
 
     // Тонкая градусная сетка (пунктир) — 3 линии
     for (let i = 1; i <= 3; i++) {
@@ -190,21 +222,23 @@
     const r1 = $("#cartouche-rect"), r2 = $("#cartouche-rect2");
     r1.setAttribute("width", w - 2); r1.setAttribute("height", h - 2);
     r2.setAttribute("width", w - 14); r2.setAttribute("height", h - 14);
-    drawIn(r1, { duration: 2000, delay: 1300 }); drawIn(r2, { duration: 2000, delay: 1600, dashed: true });
+    drawIn(r1, { duration: 1600, delay: 900 }); drawIn(r2, { duration: 1600, delay: 1100, dashed: true }); penAlong(r1, { duration: 1600, delay: 900 });
   }
 
   /* ---------- Маршрут по странице ---------- */
   const routeSvg = $("#route");
-  let routeLen = 0, routePath = null, markers = [];
+  let routeLen = 0, routePath = null, markers = [], pen = null, routeY0 = 0;
   function buildRoute() {
     const main = $("#page"), W = main.clientWidth, H = main.scrollHeight;
     routeSvg.setAttribute("viewBox", `0 0 ${W} ${H}`); routeSvg.innerHTML = "";
     const secs = $$(".sec").slice(1); // без hero
-    const pts = [[W * 0.5, 0]];
+    routeY0 = $("#hero").offsetHeight - 24; // маршрут начинается под главным экраном
+    const pts = [[W * 0.5, routeY0]];
     secs.forEach((s, i) => pts.push([W * (i % 2 === 0 ? 0.13 : 0.87), s.offsetTop + 14]));
     const last = pts[pts.length - 1]; pts.push([W * 0.5, H - 60]);
     let d = `M${pts[0][0]} ${pts[0][1]}`;
     for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; const my = (y0 + y1) / 2; d += ` C ${x0} ${my}, ${x1} ${my}, ${x1} ${y1}`; }
+    el("path", { class: "route__ghost", d, "stroke-dasharray": "3 7" }, routeSvg);
     routePath = el("path", { class: "route__path", d }, routeSvg);
     routeLen = routePath.getTotalLength();
     routePath.style.strokeDasharray = dashedArray(routeLen, 6, 8);
@@ -217,15 +251,29 @@
     // Сердце-финиш
     const fin = el("path", { ...LINE, class: "marker marker--end", d: heartPath(last[0] === W * 0.5 ? W * 0.5 : W * 0.5, H - 60, 1.1), fill: "var(--parch)" }, routeSvg);
     fin.dataset.y = H - 60; markers.push(fin);
+    pen = el("g", { class: "pen" }, routeSvg);
+    el("circle", { class: "pen__ring", r: 8 }, pen); el("circle", { class: "pen__dot", r: 4.5 }, pen);
     updateRoute();
   }
   function updateRoute() {
     if (!routePath) return;
     const main = $("#page"); const top = main.getBoundingClientRect().top + scrollY;
     const line = scrollY + innerHeight * 0.62 - top;
-    const progress = Math.max(0, Math.min(1, line / main.scrollHeight));
+    const progress = Math.max(0, Math.min(1, (line - routeY0) / (main.scrollHeight - routeY0)));
     routePath.style.strokeDashoffset = routeLen * (1 - progress);
-    markers.forEach((m) => m.classList.toggle("is-reached", Number(m.dataset.y) <= line));
+    if (pen) {
+      const pt = routePath.getPointAtLength(routeLen * progress);
+      pen.setAttribute("transform", `translate(${pt.x} ${pt.y})`); pen.style.opacity = progress > 0.01 && progress < 0.995 ? 1 : 0;
+    }
+    markers.forEach((m) => {
+      const reached = Number(m.dataset.y) <= line;
+      if (reached && !m.classList.contains("is-reached") && !REDUCED) {
+        const c = m.querySelector("circle") || m; const cx = c.getAttribute("cx"), cy = c.getAttribute("cy");
+        if (cx) { const ring = el("circle", { cx, cy, r: 9, fill: "none", stroke: "currentColor", "stroke-width": 1.2 }, routeSvg);
+          ring.animate([{ r: 9, opacity: .8 }, { r: 34, opacity: 0 }], { duration: 900, easing: "ease-out" }).onfinish = () => ring.remove(); }
+      }
+      m.classList.toggle("is-reached", reached);
+    });
   }
   addEventListener("scroll", updateRoute, { passive: true });
 
@@ -238,9 +286,10 @@
   });
 
   /* ---------- Карта ---------- */
-  const q = encodeURIComponent(CFG.mapQuery || `${CFG.region || ""} ${CFG.venueAddress || ""}`.trim());
-  $("#map").src = `https://www.google.com/maps?q=${q}&z=16&output=embed&hl=ru`;
-  $("#route-btn").href = CFG.routeUrl || `https://www.google.com/maps/search/?api=1&query=${q}`;
+  const coords = (CFG.coords || "").replace(/\s+/g, "");
+  const q = encodeURIComponent(coords || CFG.mapQuery || `${CFG.region || ""} ${CFG.venueAddress || ""}`.trim());
+  $("#map").src = CFG.mapEmbedUrl || `https://www.google.com/maps?q=${q}&z=${coords ? 17 : 16}&output=embed&hl=ru`;
+  $("#route-btn").href = CFG.routeUrl || (coords ? `https://www.google.com/maps/dir/?api=1&destination=${coords}` : `https://www.google.com/maps/search/?api=1&query=${q}`);
 
   /* ---------- Календарь ---------- */
   (function buildCalendar() {
@@ -263,31 +312,58 @@
     const box = $("#countdown");
     const u = { days: $('[data-unit="days"]'), hours: $('[data-unit="hours"]'), minutes: $('[data-unit="minutes"]'), seconds: $('[data-unit="seconds"]') };
     function set(e, v) { const s = pad2(v); if (e.textContent !== s) { e.textContent = s; e.classList.remove("tick"); void e.offsetWidth; e.classList.add("tick"); } }
+    let rolling = false;
+    function parts() { const s = Math.max(0, Math.floor((eventDate - new Date()) / 1000)); return [Math.floor(s / 86400), Math.floor((s % 86400) / 3600), Math.floor((s % 3600) / 60), s % 60]; }
+    function show(v) { set(u.days, v[0]); set(u.hours, v[1]); set(u.minutes, v[2]); set(u.seconds, v[3]); }
     function tick() {
-      const diff = eventDate - new Date();
-      if (diff <= 0) { box.innerHTML = '<div class="cd--done">Бул күн келди! ♥</div>'; return; }
-      const s = Math.floor(diff / 1000);
-      set(u.days, Math.floor(s / 86400)); set(u.hours, Math.floor((s % 86400) / 3600)); set(u.minutes, Math.floor((s % 3600) / 60)); set(u.seconds, s % 60);
+      if (eventDate - new Date() <= 0) { box.innerHTML = '<div class="cd--done">Бул күн келди! ♥</div>'; return; }
+      if (!rolling) show(parts());
       setTimeout(tick, 1000 - (Date.now() % 1000));
     }
     tick();
+    window.__rollCountdown = () => {
+      if (rolling || REDUCED) return; rolling = true; const t0 = performance.now(), target = parts();
+      (function step(now) {
+        const t = Math.min(1, (now - t0) / 1500), e = 1 - Math.pow(1 - t, 3);
+        show(target.map((v) => Math.round(v * e)));
+        if (t < 1) requestAnimationFrame(step); else { rolling = false; show(parts()); }
+      })(t0);
+    };
   })();
 
   /* ---------- Скролл: секциялар ---------- */
-  const drawnOnce = new WeakSet();
+  // Рамка секции и линия под заголовком рисуются пером
+  $$(".frame").forEach((f) => {
+    const svg = el("svg", { class: "frame__svg" }); f.insertBefore(svg, f.firstChild);
+    const t = f.querySelector(".title"); if (t) { const u = el("svg", { class: "title__line", viewBox: "0 0 200 12", preserveAspectRatio: "none" }); el("path", { class: "stroke", d: "M2 8 C 50 3, 100 11, 130 6 S 180 4, 198 8" }, u); t.appendChild(u); }
+  });
+  function frameDraw(sec) {
+    const f = sec.querySelector(".frame"), svg = sec.querySelector(".frame__svg"); if (!f || !svg) return;
+    const w = f.clientWidth, h = f.clientHeight; svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.innerHTML = "";
+    const r = el("rect", { x: 1, y: 1, width: w - 2, height: h - 2 }, svg);
+    const c = 26;
+    [`M1 ${c} V1 H${c}`, `M${w - c} 1 H${w - 1} V${c}`, `M${w - 1} ${h - c} V${h - 1} H${w - c}`, `M${c} ${h - 1} H1 V${h - c}`].forEach((d, i) => drawIn(el("path", { class: "corner", d }, svg), { duration: 500, delay: 1400 + i * 120 }));
+    drawIn(r, { duration: 1500, delay: 150 }); penAlong(r, { duration: 1500, delay: 150 });
+  }
   function onVisible(sec) {
+    if (sec.classList.contains("is-visible")) return;
     sec.classList.add("is-visible");
-    if (drawnOnce.has(sec)) return; drawnOnce.add(sec);
-    $$(".stroke", sec).forEach((p, i) => drawIn(p, { duration: 1400, delay: 500 + i * 200 }));
+    frameDraw(sec);
+    $$(".stroke", sec).forEach((p, i) => { drawIn(p, { duration: 1200, delay: 500 + i * 200 }); penAlong(p, { duration: 1200, delay: 500 + i * 200 }); });
     $$(".ring", sec).forEach((c, i) => drawIn(c, { duration: 1200, delay: 500 + i * 200 }));
     $$(".ring2", sec).forEach((c) => drawIn(c, { duration: 1200, delay: 900 }));
-    if (sec.id === "hero") { drawCompass($("#compass")).forEach((p, i) => drawIn(p, { duration: 1200, delay: 800 + i * 150 })); drawMountains($("#hero-mountains"), 3).forEach((p, i) => drawIn(p, { duration: 1600, delay: 400 + i * 200 })); }
+    if (sec.id === "hero") { drawCompass($("#compass")).forEach((p, i) => drawIn(p, { duration: 1200, delay: 800 + i * 150 })); const ms = drawMountains($("#hero-mountains"), 3); ms.forEach((p, i) => drawIn(p, { duration: 1600, delay: 400 + i * 200 })); penAlong(ms[1], { duration: 1600, delay: 600 }); }
+    if (sec.id === "countdown-sec" && window.__rollCountdown) setTimeout(window.__rollCountdown, 600);
     if (sec.id === "hosts") drawYurt($("#yurt")).forEach((p, i) => drawIn(p, { duration: 900, delay: 700 + i * 160 }));
     if (sec.id === "end") drawMountains($("#footer-mountains"), 11).forEach((p, i) => drawIn(p, { duration: 1600, delay: 200 + i * 200 }));
   }
+  // Ар бир жолу кайра тартылат / Рисуется заново при каждом возврате
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { onVisible(e.target); io.unobserve(e.target); } });
-  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    entries.forEach((e) => {
+      if (!e.isIntersecting) e.target.classList.remove("is-visible");
+      else if (e.intersectionRatio >= 0.12) onVisible(e.target);
+    });
+  }, { threshold: [0, 0.12], rootMargin: "0px 0px -6% 0px" });
   $$(".sec").forEach((s) => io.observe(s));
 
   /* ---------- Музыка ---------- */
@@ -326,13 +402,24 @@
   }
   // Шрифт жүктөлгөндөн кийин баштайбыз (бирок 1.5 секунддан ашпайт)
   Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise((r) => setTimeout(r, 1500))]).then(startIntro);
-  $("#open-btn").addEventListener("click", () => {
+  // Ачуу: сыдыруу, чыйратуу, баскыч же басуу / Открытие: свайп, колесо, клавиша или клик
+  function openInvite() {
+    if (intro.classList.contains("is-hidden")) return;
     intro.classList.add("is-hidden");
     document.body.classList.remove("locked");
     play();
     setTimeout(() => { buildRoute(); musicBtn.classList.add("is-visible"); }, 300);
-  });
-  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!document.body.classList.contains("locked")) buildRoute(); }, 200); });
+    removeEventListener("wheel", onWheel); removeEventListener("keydown", onKey);
+  }
+  const onWheel = (e) => { if (e.deltaY > 0) openInvite(); };
+  const onKey = (e) => { if (["ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) openInvite(); };
+  let touchY = null;
+  intro.addEventListener("click", openInvite);
+  intro.addEventListener("touchstart", (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  intro.addEventListener("touchmove", (e) => { if (touchY !== null && touchY - e.touches[0].clientY > 12) openInvite(); }, { passive: true });
+  addEventListener("wheel", onWheel, { passive: true });
+  addEventListener("keydown", onKey);
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!document.body.classList.contains("locked")) buildRoute(); $$(".sec.is-visible").forEach(frameDraw); }, 200); });
   // Высота страницы меняется, когда прогружаются шрифты/карта — пересчитать маршрут
   if (document.fonts) document.fonts.ready.then(() => { if (!document.body.classList.contains("locked")) buildRoute(); });
 

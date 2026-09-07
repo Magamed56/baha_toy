@@ -61,6 +61,30 @@
   $$(".hero__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.4 + i * 0.6}s`));
   $$(".reveal").forEach((r) => Array.from(r.children).forEach((c, i) => c.style.setProperty("--n", i)));
 
+  /* ---------- Параллакс, боке, наклон, волна ---------- */
+  const hero = $(".hero");
+  [1, 2, 3].forEach((i) => { const b = document.createElement("div"); b.className = `hero__bokeh hero__bokeh--${i}`; hero.insertBefore(b, hero.firstChild); });
+  let syTick = false;
+  addEventListener("scroll", () => {
+    if (syTick) return; syTick = true;
+    requestAnimationFrame(() => { document.documentElement.style.setProperty("--sy", Math.min(scrollY, 900)); syTick = false; });
+  }, { passive: true });
+  if (window.matchMedia("(hover: hover)").matches) {
+    $$(".note, .countdown__item").forEach((card) => {
+      card.addEventListener("pointermove", (e) => {
+        const r = card.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        card.classList.add("tilt-on"); card.style.transform = `perspective(700px) rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg) translateY(-4px)`;
+      });
+      card.addEventListener("pointerleave", () => { card.classList.remove("tilt-on"); card.style.transform = ""; });
+    });
+  }
+  $$(".btn").forEach((b) => b.addEventListener("pointerdown", (e) => {
+    const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height);
+    const sp = document.createElement("span"); sp.className = "ripple";
+    sp.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+    b.appendChild(sp); setTimeout(() => sp.remove(), 800);
+  }));
+
   /* ---------- Эскертүүлөр ---------- */
   const notes = $("#notes");
   (CFG.notes || []).forEach((n, i) => {
@@ -71,9 +95,10 @@
   });
 
   /* ---------- Карта ---------- */
-  const q = encodeURIComponent(CFG.mapQuery || `${CFG.region || ""} ${CFG.venueAddress || ""}`.trim());
-  $("#map").src = `https://www.google.com/maps?q=${q}&z=16&output=embed&hl=ru`;
-  $("#route-btn").href = CFG.routeUrl || `https://www.google.com/maps/search/?api=1&query=${q}`;
+  const coords = (CFG.coords || "").replace(/\s+/g, "");
+  const q = encodeURIComponent(coords || CFG.mapQuery || `${CFG.region || ""} ${CFG.venueAddress || ""}`.trim());
+  $("#map").src = CFG.mapEmbedUrl || `https://www.google.com/maps?q=${q}&z=${coords ? 17 : 16}&output=embed&hl=ru`;
+  $("#route-btn").href = CFG.routeUrl || (coords ? `https://www.google.com/maps/dir/?api=1&destination=${coords}` : `https://www.google.com/maps/search/?api=1&query=${q}`);
 
   /* ---------- Календарь ---------- */
   (function buildCalendar() {
@@ -100,24 +125,42 @@
       const s = pad2(v);
       if (el.textContent !== s) { el.textContent = s; el.classList.remove("tick"); void el.offsetWidth; el.classList.add("tick"); }
     }
+    let rolling = false;
+    function parts() { const s = Math.max(0, Math.floor((eventDate - new Date()) / 1000)); return [Math.floor(s / 86400), Math.floor((s % 86400) / 3600), Math.floor((s % 3600) / 60), s % 60]; }
+    function show(v) { set(u.days, v[0]); set(u.hours, v[1]); set(u.minutes, v[2]); set(u.seconds, v[3]); }
     function tick() {
-      const diff = eventDate - new Date();
-      if (diff <= 0) { box.innerHTML = '<div class="countdown--done">Бул күн келди! ♥</div>'; return; }
-      const s = Math.floor(diff / 1000);
-      set(u.days, Math.floor(s / 86400));
-      set(u.hours, Math.floor((s % 86400) / 3600));
-      set(u.minutes, Math.floor((s % 3600) / 60));
-      set(u.seconds, s % 60);
+      if (eventDate - new Date() <= 0) { box.innerHTML = '<div class="countdown--done">Бул күн келди! ♥</div>'; return; }
+      if (!rolling) show(parts());
       setTimeout(tick, 1000 - (Date.now() % 1000));
     }
     tick();
+    // Санак «айланып» чыгат / Цифры раскручиваются при первом показе
+    window.__rollCountdown = () => {
+      if (rolling) return; rolling = true; const t0 = performance.now(), target = parts();
+      (function step(now) {
+        const t = Math.min(1, (now - t0) / 1500), e = 1 - Math.pow(1 - t, 3);
+        show(target.map((v) => Math.round(v * e)));
+        if (t < 1) requestAnimationFrame(step); else { rolling = false; show(parts()); }
+      })(t0);
+    };
   })();
 
   /* ---------- Скролл-анимация ---------- */
+  // Секциялар ар бир жолу кайра жанданат / Анимации повторяются при каждом возврате
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); } });
-  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    entries.forEach((e) => {
+      if (!e.isIntersecting) { e.target.classList.remove("is-visible"); return; }
+      if (e.intersectionRatio < 0.12 || e.target.classList.contains("is-visible")) return;
+      e.target.classList.add("is-visible");
+      if (e.target.closest(".section--countdown") && window.__rollCountdown) setTimeout(window.__rollCountdown, 250);
+    });
+  }, { threshold: [0, 0.12], rootMargin: "0px 0px -6% 0px" });
   $$(".reveal").forEach((el) => io.observe(el));
+  const heroIo = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) hero.classList.add("is-out");
+    else if (e.intersectionRatio >= 0.3) requestAnimationFrame(() => hero.classList.remove("is-out"));
+  }), { threshold: [0, 0.3] });
+  heroIo.observe(hero);
 
   /* ---------- Музыка ---------- */
   const audio = $("#bg-music");
@@ -160,15 +203,25 @@
   /* ---------- Мукаба ---------- */
   document.body.classList.add("locked");
   const stopDust = startDust();
-  $("#open-btn").addEventListener("click", () => {
-    const intro = $("#intro");
+  // Ачуу: сыдыруу, чыйратуу, баскыч же басуу / Открытие: свайп, колесо, клавиша или клик
+  const intro = $("#intro");
+  function openInvite() {
     if (intro.classList.contains("is-opening")) return;
     intro.classList.add("is-opening");
     play();
     setTimeout(() => { document.body.classList.remove("locked"); document.body.classList.add("opened"); startPetals(); }, 450);
     setTimeout(() => { musicBtn.classList.add("is-visible"); }, 1400);
     setTimeout(() => { intro.classList.add("is-hidden"); stopDust(); }, 1900);
-  });
+    removeEventListener("wheel", onWheel); removeEventListener("keydown", onKey);
+  }
+  const onWheel = (e) => { if (e.deltaY > 0) openInvite(); };
+  const onKey = (e) => { if (["ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) openInvite(); };
+  let touchY = null;
+  intro.addEventListener("click", openInvite);
+  intro.addEventListener("touchstart", (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  intro.addEventListener("touchmove", (e) => { if (touchY !== null && touchY - e.touches[0].clientY > 12) openInvite(); }, { passive: true });
+  addEventListener("wheel", onWheel, { passive: true });
+  addEventListener("keydown", onKey);
 
   /* ---------- Алтын чаң / Золотая пыль на обложке ---------- */
   function startDust() {
@@ -222,10 +275,11 @@
       };
     }
     for (let i = 0; i < N; i++) petals.push(make(true));
+    let wind = 0; addEventListener("scroll", () => { wind = Math.min(3, wind + 0.3); }, { passive: true });
     function draw() {
-      ctx.clearRect(0, 0, W, H);
+      ctx.clearRect(0, 0, W, H); wind *= 0.95;
       petals.forEach((p) => {
-        p.sway += 0.02; p.y += p.vy; p.x += p.vx + Math.sin(p.sway) * 0.4 * dpr; p.a += p.va;
+        p.sway += 0.02 + wind * 0.01; p.y += p.vy * (1 + wind); p.x += p.vx + Math.sin(p.sway) * (0.4 + wind * 0.3) * dpr; p.a += p.va * (1 + wind);
         if (p.y > H + 30 || p.x < -40 || p.x > W + 40) Object.assign(p, make(false));
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.globalAlpha = p.o; ctx.fillStyle = p.c;
         ctx.beginPath(); ctx.moveTo(0, -p.r);

@@ -28,8 +28,10 @@
         <text id="tr-bride" class="tr tr--2" x="320" y="192">Сонунбубу</text>
       </svg>
       <p class="intro__date"><span data-cfg="dateLong">10-сентябрь 2026-жыл</span></p>
-      <button id="open-btn" class="btn" type="button"><span>Чакырууну ачуу</span></button>
-      <p class="intro__hint">🎵 музыка менен</p>
+      <button id="open-btn" class="intro__scroll" type="button" aria-label="Чакырууну ачуу">
+        <span class="intro__chev"></span><span class="intro__chev"></span><span class="intro__chev"></span>
+      </button>
+      <p class="intro__hint">Төмөн сыдырыңыз · 🎵 музыка менен</p>
     </div>
   </div>
 
@@ -46,10 +48,12 @@
       <svg class="compass" id="compass" viewBox="0 0 120 120" aria-hidden="true"></svg>
       <div class="hero__content">
         <p class="kicker">Үйлөнүү той</p>
-        <h1 class="hero__names">
-          <span class="hero__name" data-cfg="groom">Эрнис</span>
-          <span class="hero__amp">&amp;</span>
-          <span class="hero__name" data-cfg="bride">Сонунбубу</span>
+        <h1 class="hero__names" aria-label="Эрнис & Сонунбубу">
+          <svg class="names-svg names-svg--hero" viewBox="0 0 640 210" aria-hidden="true">
+            <text id="hero-groom" class="tr" x="320" y="76">Эрнис</text>
+            <text class="tr tr--amp" x="320" y="126">&amp;</text>
+            <text id="hero-bride" class="tr tr--2" x="320" y="192">Сонунбубу</text>
+          </svg>
         </h1>
         <svg class="underline" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
           <path class="stroke" d="M2 8 C 60 2, 120 12, 150 7 S 240 2, 298 8"/>

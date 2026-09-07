@@ -110,8 +110,11 @@ a { color: inherit; }
 }
 .intro__names .amp { font-size: .7em; }
 .intro__date { font-family: var(--display); font-style: italic; font-size: 1.15rem; letter-spacing: .08em; color: var(--gold-deep); margin-bottom: 1.8rem; animation: fadeUp 1.2s cubic-bezier(.2,.8,.2,1) 1.6s both; }
-.intro .btn { animation: fadeUp 1.2s cubic-bezier(.2,.8,.2,1) 2s both, shimmer 4s ease-in-out infinite; }
-.intro__hint { margin-top: 1rem; font-size: .85rem; color: var(--muted); letter-spacing: .1em; animation: fadeUp 1.2s ease 2.4s both; }
+.intro__scroll { background: none; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0; margin: .4rem auto 0; padding: .4rem 1.5rem; animation: fadeUp 1.2s cubic-bezier(.2,.8,.2,1) 2s both; }
+.intro__chev { width: 16px; height: 16px; border-right: 1.5px solid var(--gold-deep); border-bottom: 1.5px solid var(--gold-deep); transform: rotate(45deg); opacity: 0; animation: chev 2s ease-in-out infinite; margin-top: -6px; }
+.intro__chev:nth-child(2) { animation-delay: .2s; } .intro__chev:nth-child(3) { animation-delay: .4s; }
+@keyframes chev { 0% { opacity: 0; transform: rotate(45deg) translate(-5px, -5px); } 50% { opacity: 1; } 100% { opacity: 0; transform: rotate(45deg) translate(5px, 5px); } }
+.intro__hint { margin-top: .6rem; font-size: .85rem; color: var(--muted); letter-spacing: .1em; animation: fadeUp 1.2s ease 2.4s both; }
 
 /* Тамгалар / Буквы: появление по одной с размытием */
 .ch { display: inline-block; opacity: 0; transform: translateY(.45em) rotate(-6deg) scale(.9); filter: blur(6px); transform-origin: bottom left;
@@ -277,7 +280,7 @@ body.opened .fade-up { animation-play-state: running; }
 .success p { font-size: 1.15rem; line-height: 1.7; }
 
 /* ---------- Аягы / Footer ---------- */
-.footer { padding: clamp(4rem, 12vw, 7rem) 0 6rem; background: linear-gradient(160deg, var(--dark), var(--dark-2)); color: var(--bg); text-align: center; }
+.footer { padding: clamp(4rem, 12vw, 7rem) 0 6rem; background: linear-gradient(160deg, var(--dark), var(--dark-2)); color: var(--bg); text-align: center; overflow: hidden; }
 .footer__hearts span { color: var(--rose); font-size: 1.4rem; margin: 0 .2rem; display: inline-block; animation: heartbeat 1.6s ease-in-out infinite; }
 .footer__hearts span:nth-child(2) { animation-delay: .2s; font-size: 1.8rem; }
 .footer__hearts span:nth-child(3) { animation-delay: .4s; }
@@ -290,3 +293,41 @@ body.opened .fade-up { animation-play-state: running; }
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
   .fade-up, .reveal, .note { opacity: 1; transform: none; }
 }
+
+/* ===== Кошумча анимациялар / Дополнительные анимации ===== */
+.hero__bokeh { position: absolute; border-radius: 50%; filter: blur(28px); opacity: .6; pointer-events: none; will-change: transform; }
+.hero__bokeh--1 { width: 36vmax; height: 36vmax; left: -10vmax; top: 8%; background: radial-gradient(circle, rgba(217,203,176,.75), transparent 65%); animation: floatA 16s ease-in-out infinite; }
+.hero__bokeh--2 { width: 28vmax; height: 28vmax; right: -8vmax; bottom: 6%; background: radial-gradient(circle, rgba(209,149,158,.5), transparent 65%); animation: floatB 20s ease-in-out infinite; }
+.hero__bokeh--3 { width: 18vmax; height: 18vmax; left: 55%; top: -5vmax; background: radial-gradient(circle, rgba(154,146,139,.45), transparent 65%); animation: floatA 24s ease-in-out -7s infinite; }
+@keyframes floatA { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4vmax,-3vmax) scale(1.08); } }
+@keyframes floatB { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-3vmax,4vmax) scale(1.1); } }
+/* Параллакс при прокрутке (--sy задаёт скрипт) */
+.hero__floral--tl { translate: 0 calc(var(--sy, 0) * .12px); }
+.hero__floral--br { translate: 0 calc(var(--sy, 0) * -.1px); }
+.hero__content { translate: 0 calc(var(--sy, 0) * .28px); opacity: calc(1 - var(--sy, 0) / 650); }
+.hero__glow { translate: 0 calc(var(--sy, 0) * .15px); }
+/* Блик по именам */
+.hero__names, .footer__names { position: relative; }
+.hero__names::after, .footer__names::after {
+  content: ""; position: absolute; inset: -6% -10%; pointer-events: none; mix-blend-mode: soft-light;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,246,220,.95) 50%, transparent 60%); background-size: 260% 100%;
+  animation: sheen 6s ease-in-out 3.6s infinite; animation-play-state: paused;
+}
+body.opened .hero__names::after, .is-visible .footer__names::after { animation-play-state: running; }
+/* Линия под заголовками секций */
+.section__title { position: relative; display: inline-block; padding-bottom: .4rem; }
+.section__title::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 0; height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, var(--gold), transparent); transition: width 1.3s cubic-bezier(.2,.8,.2,1) .55s; }
+.reveal.is-visible .section__title::after { width: 72%; }
+/* Наклон карточек за курсором */
+.note, .countdown__item { transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s, opacity .8s, filter .8s; transform-style: preserve-3d; }
+.tilt-on { transition: transform .12s linear !important; }
+/* Волна по кнопке */
+.btn .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,.55); transform: scale(0); animation: rippleOut .7s ease-out forwards; pointer-events: none; z-index: 0; }
+@keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+/* Пульсирующее кольцо вокруг кнопки на обложке */
+.intro .btn::before { content: ""; position: absolute; inset: -6px; border-radius: 999px; border: 1px solid rgba(185,165,130,.7); animation: ringPulse 2.4s ease-out 3s infinite; }
+@keyframes ringPulse { 0% { transform: scale(.96); opacity: .9; } 100% { transform: scale(1.18); opacity: 0; } }
+
+/* Кайра келгенде кайра ойнойт / Повтор анимаций при возврате */
+.hero.is-out .ch, .hero.is-out .fade-up, .hero.is-out .draw { animation: none !important; }
+.hero.is-out .ch, .hero.is-out .fade-up { opacity: 0; }

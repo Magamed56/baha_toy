@@ -34,7 +34,7 @@ h1, h2, h3 { font-weight: 400; margin: 0; }
 p, ul { margin: 0; }
 a { color: inherit; }
 .amp { font-family: var(--script); color: var(--sepia); }
-.stroke { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.stroke { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------- Баскычтар ---------- */
 .btn {
@@ -57,33 +57,36 @@ a { color: inherit; }
   transition: transform 1.2s cubic-bezier(.6,0,.3,1), opacity 1s ease .2s, visibility 1.2s;
 }
 .intro.is-hidden { transform: perspective(1400px) rotateX(-70deg) translateY(-6vh); opacity: 0; visibility: hidden; pointer-events: none; }
-.intro__map { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--sepia); }
+.intro__map { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--ink-soft); }
 .cartouche {
   position: relative; width: min(500px, 100%); padding: clamp(1.8rem, 5vw, 2.8rem) clamp(1.2rem, 4vw, 2.4rem);
   background: rgba(249,245,236,.92); text-align: center; color: var(--ink);
-  opacity: 0; transform: translateY(16px); animation: cartIn 1.2s var(--ease) 1.2s forwards;
+  opacity: 0; transform: translateY(16px); animation: cartIn 1s var(--ease) .8s forwards;
 }
 @keyframes cartIn { to { opacity: 1; transform: none; } }
 .cartouche__frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.cartouche__frame rect { fill: none; stroke: var(--sepia); stroke-width: 1.2; }
-.intro__kicker { font-size: .78rem; letter-spacing: .38em; text-transform: uppercase; color: var(--sepia); margin-bottom: .6rem; opacity: 0; animation: fadeIn 1s ease 2s forwards; }
+.cartouche__frame rect { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; }
+.intro__kicker { font-size: .78rem; letter-spacing: .38em; text-transform: uppercase; color: var(--sepia); margin-bottom: .6rem; opacity: 0; animation: fadeIn 1s ease 1.4s forwards; }
 .names-svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; overflow: visible; }
 .tr {
-  font-family: var(--script); font-size: 74px; text-anchor: middle; fill: transparent; stroke: var(--ink); stroke-width: .9;
+  font-family: var(--script); font-size: 74px; text-anchor: middle; fill: transparent; stroke: var(--ink); stroke-width: 1.3;
   stroke-dasharray: 700; stroke-dashoffset: 700; stroke-linecap: round; stroke-linejoin: round;
-  animation: trace 2.6s ease-in-out var(--d, 2.2s) forwards, fillIn 1.4s ease calc(var(--d, 2.2s) + 1.8s) forwards;
+  animation: trace 2.2s ease-in-out var(--d, 1.4s) forwards, fillIn 1.2s ease calc(var(--d, 1.4s) + 1.5s) forwards;
 }
-.tr--amp { font-size: 44px; stroke: var(--sepia); --d: 3.4s; }
+.tr--amp { font-size: 44px; stroke: var(--sepia); --d: 2.4s; }
 .tr--amp { animation-name: trace, fillInSepia; }
-.tr--2 { --d: 3.8s; }
+.tr--2 { --d: 2.7s; }
 @keyframes trace { to { stroke-dashoffset: 0; } }
 @keyframes fillIn { to { fill: var(--ink); } }
 @keyframes fillInSepia { to { fill: var(--sepia); } }
 @keyframes fadeIn { to { opacity: 1; } }
-.intro__date { font-family: var(--display); font-style: italic; font-size: 1.1rem; letter-spacing: .06em; color: var(--sepia); margin: .4rem 0 1.6rem; opacity: 0; animation: fadeIn 1s ease 5.4s forwards; }
-.intro .btn { opacity: 0; animation: fadeIn 1s ease 5.8s forwards; }
-.intro__hint { margin-top: .9rem; font-size: .82rem; color: var(--ink-soft); letter-spacing: .1em; opacity: 0; animation: fadeIn 1s ease 6.2s forwards; }
-.intro:not(.is-ready) :is(.cartouche, .intro__kicker, .tr, .intro__date, .btn, .intro__hint) { animation-play-state: paused; }
+.intro__date { font-family: var(--display); font-style: italic; font-size: 1.1rem; letter-spacing: .06em; color: var(--sepia); margin: .4rem 0 1.2rem; opacity: 0; animation: fadeIn 1s ease 4.2s forwards; }
+.intro__scroll { background: none; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; margin: .2rem auto 0; padding: .4rem 1.5rem; opacity: 0; animation: fadeIn 1s ease 4.4s forwards; }
+.intro__chev { width: 16px; height: 16px; border-right: 1.4px solid var(--sepia); border-bottom: 1.4px solid var(--sepia); transform: rotate(45deg); opacity: 0; animation: chev 2s ease-in-out infinite; margin-top: -6px; }
+.intro__chev:nth-child(2) { animation-delay: .2s; } .intro__chev:nth-child(3) { animation-delay: .4s; }
+@keyframes chev { 0% { opacity: 0; transform: rotate(45deg) translate(-5px, -5px); } 50% { opacity: 1; } 100% { opacity: 0; transform: rotate(45deg) translate(5px, 5px); } }
+.intro__hint { margin-top: .5rem; font-size: .82rem; color: var(--ink-soft); letter-spacing: .1em; opacity: 0; animation: fadeIn 1s ease 4.6s forwards; }
+.intro:not(.is-ready) :is(.cartouche, .intro__kicker, .tr, .intro__date, .intro__scroll, .intro__hint) { animation-play-state: paused; }
 
 /* ---------- Музыка ---------- */
 .music-btn {
@@ -103,10 +106,15 @@ a { color: inherit; }
 
 /* ---------- Маршрут ---------- */
 .page { position: relative; }
-.route { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; color: var(--sepia); overflow: visible; }
-.route .route__path { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; opacity: .55; }
-.route .marker { transition: transform .6s var(--ease), opacity .6s; opacity: .45; }
-.route .marker circle { fill: var(--parch); stroke: currentColor; stroke-width: 1.4; }
+.route { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; color: var(--ink-soft); overflow: visible; }
+.route .route__path { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; opacity: .85; }
+.route .route__ghost { fill: none; stroke: currentColor; stroke-width: 1; opacity: .18; }
+.route .marker { transition: transform .6s var(--ease), opacity .6s; opacity: .5; }
+.route .marker circle { fill: var(--parch); stroke: currentColor; stroke-width: 2; }
+.route .pen { transition: opacity .4s; }
+.route .pen .pen__dot { fill: var(--ink); }
+.route .pen .pen__ring { fill: none; stroke: var(--ink); stroke-width: 1.5; animation: penRing 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes penRing { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(2.2); opacity: 0; } }
 .route .marker .dot { fill: currentColor; stroke: none; transform: scale(0); transform-origin: center; transform-box: fill-box; transition: transform .5s cubic-bezier(.2,.9,.3,1.4); }
 .route .marker.is-reached { opacity: 1; }
 .route .marker.is-reached .dot { transform: scale(1); }
@@ -117,18 +125,18 @@ a { color: inherit; }
   position: relative; width: min(680px, 100%); margin: 0 auto; padding: clamp(1.8rem, 5vw, 2.8rem) clamp(1rem, 4vw, 2.2rem);
   text-align: center; background: rgba(249,245,236,.86);
 }
-.frame::before, .frame::after { content: ""; position: absolute; width: 0; height: 0; border: 1px solid var(--sepia); transition: width 1s var(--ease), height 1s var(--ease) .15s; }
-.frame::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-.frame::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-.is-visible .frame::before, .is-visible .frame::after { width: 56px; height: 56px; }
+.frame__svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; color: var(--ink-soft); }
+.frame__svg rect { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.frame__svg .corner { fill: none; stroke: currentColor; stroke-width: 2; }
 .frame .edge { position: absolute; }
-.kicker { position: relative; display: inline-block; font-size: .76rem; letter-spacing: .38em; text-transform: uppercase; color: var(--sepia); margin-bottom: .9rem; padding-bottom: .5rem; opacity: 0; transition: opacity .8s; }
+.kicker { position: relative; display: table; margin-left: auto; margin-right: auto; font-size: .76rem; letter-spacing: .38em; text-transform: uppercase; color: var(--sepia); margin-bottom: .9rem; padding-bottom: .5rem; opacity: 0; transition: opacity .8s; }
 .kicker::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 0; height: 1px; background: var(--sepia); transform: translateX(-50%); transition: width 1s var(--ease) .2s; }
 .is-visible .kicker { opacity: 1; }
 .is-visible .kicker::after { width: 100%; }
-.title { font-family: var(--display); font-size: clamp(1.8rem, 6vw, 2.5rem); line-height: 1.25; color: var(--ink); margin-bottom: 1rem; text-wrap: balance;
-  clip-path: inset(0 100% 0 0); transition: clip-path 1.2s var(--ease) .25s; }
+.title { position: relative; display: inline-block; font-family: var(--display); font-size: clamp(1.8rem, 6vw, 2.5rem); line-height: 1.25; color: var(--ink); margin-bottom: 1rem; padding-bottom: .5rem; text-wrap: balance;
+  clip-path: inset(0 100% 0 0); transition: clip-path 1s var(--ease) .3s; }
 .is-visible .title { clip-path: inset(0 0 0 0); }
+.title__line { position: absolute; left: 0; right: 0; bottom: 0; height: 12px; width: 100%; color: var(--sepia); overflow: visible; }
 .fade { opacity: 0; transform: translateY(16px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
 .is-visible .fade { opacity: 1; transform: none; }
 .is-visible .fade:nth-of-type(2) { transition-delay: .5s; }
@@ -147,7 +155,12 @@ a { color: inherit; }
 .hero__content { position: relative; z-index: 1; padding-bottom: clamp(6rem, 18vh, 10rem); }
 .hero .kicker { opacity: 0; }
 .hero.is-visible .kicker { opacity: 1; }
-.hero__names { font-family: var(--script); font-size: clamp(3.4rem, 14vw, 7rem); line-height: 1.05; color: var(--ink); margin: .4rem 0 .2rem; display: flex; flex-direction: column; align-items: center; }
+.hero__names { margin: .2rem 0 0; }
+.names-svg--hero { max-width: min(560px, 92vw); }
+.names-svg--hero .tr { --d: .3s; stroke-width: 1.4; }
+.names-svg--hero .tr--amp { --d: 1.3s; }
+.names-svg--hero .tr--2 { --d: 1.6s; }
+.hero:not(.is-visible) .tr { animation: none; }
 .hero__name { opacity: 0; filter: blur(6px); transform: translateY(14px); transition: opacity 1.2s var(--ease), filter 1.2s, transform 1.2s var(--ease); }
 .hero__amp { font-size: .5em; color: var(--sepia); opacity: 0; transition: opacity 1s .9s; }
 .hero.is-visible .hero__name { opacity: 1; filter: blur(0); transform: none; }
@@ -247,3 +260,22 @@ a { color: inherit; }
   .fade, .title, .kicker, .hero__name, .hero__amp, .hero__date, .hero__sub, .cartouche, .intro__kicker, .intro__date, .intro .btn, .intro__hint { opacity: 1; transform: none; clip-path: none; filter: none; }
   .tr { stroke-dashoffset: 0; fill: var(--ink); }
 }
+
+/* ===== Кошумча анимациялар ===== */
+.hero__content { translate: 0 calc(var(--sy, 0) * .22px); opacity: calc(1 - var(--sy, 0) / 700); }
+.mountains:not(.mountains--footer) { translate: 0 calc(var(--sy, 0) * .35px); }
+.compass { rotate: calc(var(--sy, 0) * .12deg); }
+.legend li { transition: transform .5s var(--ease), box-shadow .5s; }
+.legend li:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(45,40,35,.08); }
+.cd { transition: transform .5s var(--ease); }
+.cd:hover { transform: translateY(-3px); }
+.btn .ripple { position: absolute; border-radius: 50%; background: rgba(45,40,35,.18); transform: scale(0); animation: rippleOut .7s ease-out forwards; pointer-events: none; z-index: 0; }
+@keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+
+.route .marker.is-reached circle:first-child { animation: markerPop .6s cubic-bezier(.2,.9,.3,1.4); }
+@keyframes markerPop { 0% { transform: scale(.6); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+.route .marker circle { transform-box: fill-box; transform-origin: center; }
+
+/* Заметнее: рисунки темнее */
+.compass, .mountains, .yurt, .underline { color: var(--ink-soft); }
+.mountains .snow { opacity: .9; }
