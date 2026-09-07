@@ -26,6 +26,7 @@
     dateLong: `${D}-${MONTHS[M - 1]} ${Y}-жыл`, weekday: WEEKDAYS[eventDate.getDay()],
     timeStart: CFG.timeStart, timeEnd: CFG.timeEnd,
     region: CFG.region, venueName: CFG.venueName, venueAddress: CFG.venueAddress,
+    addressLine: [CFG.region, CFG.venueAddress].filter(Boolean).join(", "),
     inviteTitle: CFG.inviteTitle, inviteText: fill(CFG.inviteText), closingText: CFG.closingText,
   };
   $$("[data-cfg]").forEach((el) => { const v = values[el.dataset.cfg]; if (v) el.textContent = v; });
@@ -298,6 +299,14 @@
   function play() { const p = audio.play(); if (p && p.then) p.then(() => { fadeTo(0.7); setPlaying(true); }).catch(() => setPlaying(false)); else { fadeTo(0.7); setPlaying(true); } }
   function pause() { fadeTo(0, 700); setPlaying(false); }
   musicBtn.addEventListener("click", () => (audio.paused || audio.volume === 0 ? play() : pause()));
+  // Автозапуск: музыка башталат кирээри менен (браузер уруксат берсе), болбосо — биринчи басууда
+  (function autoplay() {
+    const EVENTS = ["pointerdown", "touchstart", "keydown"];
+    const onFirst = () => { EVENTS.forEach((e) => removeEventListener(e, onFirst)); play(); };
+    const p = audio.play();
+    if (p && p.then) p.then(() => { fadeTo(0.7); setPlaying(true); }).catch(() => EVENTS.forEach((e) => addEventListener(e, onFirst, { passive: true })));
+    else { fadeTo(0.7); setPlaying(true); }
+  })();
   document.addEventListener("visibilitychange", () => { if (document.hidden && !audio.paused) audio.pause(); else if (!document.hidden && musicBtn.classList.contains("is-playing")) audio.play().catch(() => {}); });
 
   /* ---------- Мукабаны ачуу ---------- */
