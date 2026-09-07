@@ -6,6 +6,12 @@
   const CFG = window.WEDDING || {};
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  /* ---------- Ар дайым башынан / Всегда открывать с начала ---------- */
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  const toTop = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  toTop(); addEventListener("load", toTop); addEventListener("pageshow", toTop);
   const NS = "http://www.w3.org/2000/svg";
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

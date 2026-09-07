@@ -7,6 +7,12 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+  /* ---------- Ар дайым башынан / Всегда открывать с начала ---------- */
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  const toTop = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  toTop(); addEventListener("load", toTop); addEventListener("pageshow", toTop);
+
   /* ---------- Күн / Дата ---------- */
   const MONTHS = ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"];
   const MONTHS_CAP = MONTHS.map((m) => m[0].toUpperCase() + m.slice(1));
@@ -148,6 +154,8 @@
     if (document.hidden && !audio.paused) audio.pause();
     else if (!document.hidden && musicBtn.classList.contains("is-playing")) audio.play().catch(() => {});
   });
+
+  $(".scroll-hint").addEventListener("click", (e) => { e.preventDefault(); $("#invite").scrollIntoView({ behavior: "smooth" }); });
 
   /* ---------- Мукаба ---------- */
   document.body.classList.add("locked");
