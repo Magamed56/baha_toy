@@ -47,11 +47,11 @@
 
 ## Публикация на GitHub Pages
 
-1. Создайте **публичный** репозиторий на GitHub и запушьте эти файлы в ветку `main`.
-2. Workflow `.github/workflows/deploy.yml` сам включит GitHub Pages и опубликует сайт.
-3. Адрес: `https://<пользователь>.github.io/<репозиторий>/` (см. Settings → Pages).
+Сайт живёт по адресу https://magamed56.github.io/ernis_toy/ (версия 2: https://magamed56.github.io/ernis_toy/v2/).
 
-Если Actions не запустился: **Settings → Pages → Source → GitHub Actions**.
+GitHub Pages раздаёт ветку `gh-pages`. Workflow `.github/workflows/deploy.yml`
+при каждом пуше в `main` копирует её в `gh-pages`, поэтому достаточно править
+файлы в `main`: через 1–2 минуты сайт обновится.
 
 ## Локальный просмотр
 
