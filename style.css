@@ -92,7 +92,7 @@ a { color: inherit; }
 .env__front::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); background-size: 250% 100%; animation: sheen 6s ease-in-out 2s infinite; }
 .env__flap { top: 0; height: 58%; z-index: 4; background: linear-gradient(180deg, #e6dccb, #d8cbb5); clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: 50% 0; transition: transform .9s cubic-bezier(.6,0,.3,1); backface-visibility: visible; }
 .env.is-open .env__flap { transform: rotateX(180deg); z-index: 1; transition: transform .9s cubic-bezier(.6,0,.3,1), z-index 0s .45s; }
-.env__card { position: absolute; left: 5%; right: 5%; top: 6%; height: 96%; z-index: 2; margin: 0; overflow: hidden;
+.env__card { position: absolute; left: 5%; right: 5%; top: 6%; height: 93%; z-index: 2; margin: 0; overflow: hidden;
   padding: clamp(1.4rem, 4vw, 2.2rem) clamp(1.2rem, 4vw, 2.4rem) 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   background: rgba(253,252,250,.97); border: 1px solid rgba(185,165,130,.4); border-radius: 18px; box-shadow: 0 -10px 30px rgba(60,50,30,.12);
   text-align: center; transition: transform .95s cubic-bezier(.2,.8,.2,1) .55s; }
@@ -107,7 +107,6 @@ a { color: inherit; }
 .intro__bottom { display: grid; justify-items: center; gap: .1rem; animation: fadeUp 1.2s cubic-bezier(.2,.8,.2,1) 1.6s both; }
 .intro__chevs { display: flex; flex-direction: column; align-items: center; }
 .intro.is-opening .intro__bottom { opacity: 0; transition: opacity .4s; }
-.intro__card { position: relative; }
 .env:not(.is-open) .ch { animation-play-state: paused; }
 .intro__card::before { content: ""; position: absolute; inset: 10px; border: 1px solid rgba(185,165,130,.4); border-radius: 18px; pointer-events: none; }
 .intro__card::after {
@@ -122,9 +121,10 @@ a { color: inherit; }
 .intro__kicker { font-size: .72rem; letter-spacing: .6em; text-transform: uppercase; color: var(--muted); animation: tracking 1.8s cubic-bezier(.2,.8,.2,1) .4s both; }
 @keyframes tracking { from { letter-spacing: .9em; opacity: 0; } to { letter-spacing: .35em; opacity: 1; } }
 .intro__names {
-  font-family: var(--script); font-size: clamp(2.2rem, 7.5vw, 3.2rem); line-height: 1.15; color: var(--dark);
-  margin: .6rem 0 .3rem; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .1em .4em;
+  font-family: var(--script); font-size: clamp(2.1rem, 7.5vw, 3rem); line-height: 1.12; color: var(--dark);
+  margin: .3rem 0 .2rem; display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%;
 }
+.intro__names > span { white-space: nowrap; }
 .intro__names .amp { font-size: .7em; }
 .intro__date { font-family: var(--display); font-style: italic; font-size: 1.05rem; letter-spacing: .08em; color: var(--gold-deep); margin-bottom: .6rem; }
 .intro__chev { width: 16px; height: 16px; border-right: 1.5px solid var(--gold-deep); border-bottom: 1.5px solid var(--gold-deep); transform: rotate(45deg); opacity: 0; animation: chev 2s ease-in-out infinite; margin-top: -6px; }
