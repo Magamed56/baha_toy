@@ -16,36 +16,53 @@
 </head>
 <body>
 
-  <!-- ===== Мукаба / Обложка ===== -->
+  <!-- ===== Конверт / Обложка ===== -->
   <div id="intro" class="intro">
-    <div class="intro__panel intro__panel--l"></div>
-    <div class="intro__panel intro__panel--r"></div>
-    <canvas id="dust" class="intro__dust" aria-hidden="true"></canvas>
-    <div class="intro__stack">
-    <div class="env" id="env">
-      <div class="env__back"></div>
-      <div class="intro__card env__card">
-      <svg class="intro__ornament" viewBox="0 0 200 40" aria-hidden="true">
-        <path d="M5 20 C40 0, 70 40, 100 20 S160 0, 195 20" fill="none" stroke="currentColor" stroke-width="1"/>
-        <circle cx="100" cy="20" r="3" fill="currentColor"/>
+    <div class="env2" id="env">
+      <div class="env2__flap env2__flap--left"></div>
+      <div class="env2__flap env2__flap--right"></div>
+      <div class="env2__flap env2__flap--bottom"></div>
+      <div class="env2__flap env2__flap--top"></div>
+      <svg class="env2__folds" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 0 L50 50 L100 0 M0 100 L50 50 L100 100" vector-effect="non-scaling-stroke"/>
       </svg>
-      <p class="intro__kicker">Үйлөнүү тойго чакыруу</p>
-      <h1 class="intro__names">
-        <span data-cfg="groom">Эрнис</span>
-        <span class="amp">&amp;</span>
-        <span data-cfg="bride">Сонунбубу</span>
-      </h1>
-      <p class="intro__date" data-cfg="dateLong">10-сентябрь 2026-жыл</p>
-      </div>
-      <div class="env__front"></div>
-      <div class="env__flap"></div>
-      <button id="open-btn" class="env__seal" type="button" aria-label="Чакырууну ачуу"><span id="seal-text">Э<i>&amp;</i>С</span></button>
+      <canvas id="dust" class="intro__dust" aria-hidden="true"></canvas>
+      <button id="open-btn" class="seal" type="button" aria-label="Чакырууну ачуу">
+        <svg class="seal__svg" viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <radialGradient id="wax" cx="36%" cy="30%" r="78%">
+              <stop offset="0" stop-color="#eed7ad"/><stop offset=".5" stop-color="#cfa96c"/><stop offset=".85" stop-color="#9c7743"/><stop offset="1" stop-color="#7e5d30"/>
+            </radialGradient>
+            <radialGradient id="waxRim" cx="50%" cy="50%" r="50%">
+              <stop offset=".78" stop-color="rgba(255,255,255,0)"/><stop offset=".93" stop-color="rgba(255,240,210,.45)"/><stop offset="1" stop-color="rgba(120,90,45,.5)"/>
+            </radialGradient>
+          </defs>
+          <path class="seal__blob" d="M100 14 c 40 -4 76 26 82 66 c 6 42 -18 84 -60 100 c -44 16 -94 -6 -110 -50 c -16 -46 8 -96 52 -110 c 12 -4 24 -6 36 -6 Z" fill="url(#wax)"/>
+          <path d="M100 14 c 40 -4 76 26 82 66 c 6 42 -18 84 -60 100 c -44 16 -94 -6 -110 -50 c -16 -46 8 -96 52 -110 c 12 -4 24 -6 36 -6 Z" fill="url(#waxRim)"/>
+          <g class="seal__rose seal__rose--dark" transform="translate(1.6 1.6)">
+            <path d="M100 76 c -9 -1 -14 8 -7 13 c 6 4 14 -1 10 -7 c -2 -4 -8 -3 -8 1"/>
+            <path d="M86 80 c -11 6 -9 22 4 26 c 12 4 24 -4 22 -17 c -1 -8 -7 -13 -15 -13"/>
+            <path d="M80 94 c -5 12 5 25 20 22 c 13 -2 21 -13 17 -25"/>
+            <path d="M102 118 c 2 14 0 28 -6 42"/>
+            <path d="M98 140 c -12 -10 -26 -6 -30 4 c 10 6 24 4 30 -4 Z"/>
+            <path d="M100 132 c 10 -12 26 -10 30 0 c -10 8 -24 6 -30 0 Z"/>
+          </g>
+          <g class="seal__rose seal__rose--light">
+            <path d="M100 76 c -9 -1 -14 8 -7 13 c 6 4 14 -1 10 -7 c -2 -4 -8 -3 -8 1"/>
+            <path d="M86 80 c -11 6 -9 22 4 26 c 12 4 24 -4 22 -17 c -1 -8 -7 -13 -15 -13"/>
+            <path d="M80 94 c -5 12 5 25 20 22 c 13 -2 21 -13 17 -25"/>
+            <path d="M102 118 c 2 14 0 28 -6 42"/>
+            <path d="M98 140 c -12 -10 -26 -6 -30 4 c 10 6 24 4 30 -4 Z"/>
+            <path d="M100 132 c 10 -12 26 -10 30 0 c -10 8 -24 6 -30 0 Z"/>
+          </g>
+        </svg>
+      </button>
+      <p class="intro__tap" data-i18n="tap">Чакырууну ачуу үчүн басыңыз</p>
     </div>
-    <div class="intro__bottom">
-      <span class="intro__chevs"><span class="intro__chev"></span><span class="intro__chev"></span><span class="intro__chev"></span></span>
-      <p class="intro__hint">Төмөн сыдырыңыз · 🎵 музыка менен</p>
-    </div>
-    </div>
+  </div>
+  <div class="lang" id="lang" role="group" aria-label="Тил / Язык">
+    <button type="button" data-lang="ru">РУ</button>
+    <button type="button" data-lang="ky" class="is-active">КЫ</button>
   </div>
 
   <!-- ===== Музыка ===== -->
@@ -88,7 +105,7 @@
       </svg>
 
       <div class="hero__content">
-        <p class="hero__kicker fade-up" style="--d:.2s">Үйлөнүү той</p>
+        <p class="hero__kicker fade-up" style="--d:.2s" data-i18n="heroKicker">Үйлөнүү той</p>
         <h1 class="hero__names">
           <span class="fade-up" style="--d:.5s" data-cfg="groom">Эрнис</span>
           <span class="hero__amp fade-up" style="--d:.8s">&amp;</span>
@@ -110,7 +127,7 @@
     <!-- ===== Чакыруу ===== -->
     <section id="invite" class="section section--invite">
       <div class="container reveal">
-        <p class="kicker">Чакыруу</p>
+        <p class="kicker" data-i18n="kInvite">Чакыруу</p>
         <h2 class="section__title" data-cfg="inviteTitle">Урматтуу коноктор!</h2>
         <div class="ornament"></div>
         <p class="lead" data-cfg="inviteText">
@@ -124,26 +141,26 @@
     <!-- ===== Той салтанаты ===== -->
     <section class="section section--date">
       <div class="container reveal">
-        <p class="kicker">Той салтанаты</p>
+        <p class="kicker" data-i18n="kDate">Той салтанаты</p>
         <h2 class="section__title"><span data-cfg="dateLong">10-сентябрь 2026-жыл</span></h2>
-        <p class="section__sub"><span data-cfg="weekday">Ишемби</span> · саат <strong data-cfg="timeStart">17:00</strong></p>
+        <p class="section__sub"><span data-cfg="weekday">Ишемби</span> · <span data-i18n="at">саат</span> <strong data-cfg="timeStart">17:00</strong></p>
         <div id="calendar" class="calendar" aria-label="Календарь"></div>
-        <p class="section__note">Той <strong data-cfg="timeStart">17:00</strong> — <strong data-cfg="timeEnd">23:00</strong></p>
-        <p class="section__hint">Той убактысынан кечикпеңиздер!</p>
-        <a id="cal-btn" class="btn btn--outline btn--small" href="#" target="_blank" rel="noopener"><span>📅 Календарга кошуу</span></a>
+        <p class="section__note"><span data-i18n="toy">Той</span> <strong data-cfg="timeStart">17:00</strong> — <strong data-cfg="timeEnd">23:00</strong></p>
+        <p class="section__hint" data-i18n="late">Той убактысынан кечикпеңиздер!</p>
+        <a id="cal-btn" class="btn btn--outline btn--small" href="#" target="_blank" rel="noopener"><span data-i18n="calBtn">📅 Календарга кошуу</span></a>
       </div>
     </section>
 
     <!-- ===== Тойго чейин ===== -->
     <section class="section section--countdown">
       <div class="container reveal">
-        <p class="kicker kicker--light">Тойго чейин</p>
-        <h2 class="section__title section__title--light">Калды</h2>
+        <p class="kicker kicker--light" data-i18n="kCountdown">Тойго чейин</p>
+        <h2 class="section__title section__title--light" data-i18n="countdownTitle">Калды</h2>
         <div id="countdown" class="countdown" aria-live="polite">
-          <div class="countdown__item"><span class="countdown__num" data-unit="days">00</span><span class="countdown__label">күн</span></div>
-          <div class="countdown__item"><span class="countdown__num" data-unit="hours">00</span><span class="countdown__label">саат</span></div>
-          <div class="countdown__item"><span class="countdown__num" data-unit="minutes">00</span><span class="countdown__label">мүнөт</span></div>
-          <div class="countdown__item"><span class="countdown__num" data-unit="seconds">00</span><span class="countdown__label">секунд</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-unit="days">00</span><span class="countdown__label" data-i18n="days">күн</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-unit="hours">00</span><span class="countdown__label" data-i18n="hours">саат</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-unit="minutes">00</span><span class="countdown__label" data-i18n="minutes">мүнөт</span></div>
+          <div class="countdown__item"><span class="countdown__num" data-unit="seconds">00</span><span class="countdown__label" data-i18n="seconds">секунд</span></div>
         </div>
       </div>
     </section>
@@ -151,14 +168,14 @@
     <!-- ===== Дарегибиз ===== -->
     <section class="section section--venue">
       <div class="container reveal">
-        <p class="kicker">Дарегибиз</p>
+        <p class="kicker" data-i18n="kVenue">Дарегибиз</p>
         <h2 class="section__title" data-cfg="venueName">«Ачык асман» кафеси</h2>
         <p class="venue__address" data-cfg="addressLine">Бишкек шаары</p>
         <div class="map-wrap">
           <iframe id="map" title="Карта" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
         </div>
         <a id="route-btn" class="btn btn--outline" href="#" target="_blank" rel="noopener">
-          <span>📍 Картадан кароо</span>
+          <span data-i18n="routeBtn">📍 Картадан кароо</span>
         </a>
       </div>
     </section>
@@ -166,22 +183,22 @@
     <!-- ===== Той ээлери ===== -->
     <section class="section section--hosts">
       <div class="container reveal">
-        <p class="kicker">Той ээлери</p>
+        <p class="kicker" data-i18n="kHosts">Той ээлери</p>
         <h2 class="hosts__names">
           <span data-cfg="hostFather">Илязбек</span>
           <span class="amp">&amp;</span>
           <span data-cfg="hostMother">Мукадас</span>
         </h2>
         <div class="ornament"></div>
-        <p class="hosts__text">Сиздерди ак дасторконубуздун кадырлуу коногу болууга чакырабыз</p>
+        <p class="hosts__text" data-i18n="hostsText">Сиздерди ак дасторконубуздун кадырлуу коногу болууга чакырабыз</p>
       </div>
     </section>
 
     <!-- ===== Эскертүү ===== -->
     <section class="section section--notes">
       <div class="container reveal">
-        <p class="kicker">Эскертүү</p>
-        <h2 class="section__title">Маанилүү маалымат</h2>
+        <p class="kicker" data-i18n="kNotes">Эскертүү</p>
+        <h2 class="section__title" data-i18n="notesTitle">Маанилүү маалымат</h2>
         <div id="notes" class="notes"></div>
       </div>
     </section>
@@ -189,30 +206,30 @@
     <!-- ===== Суроо (RSVP) ===== -->
     <section id="rsvp" class="section section--rsvp">
       <div class="container reveal">
-        <p class="kicker">Суроо</p>
-        <h2 class="section__title">Тойго келесизби?</h2>
-        <p class="section__sub">Жообуңузду алдын ала билдирип коюңуз</p>
+        <p class="kicker" data-i18n="kRsvp">Суроо</p>
+        <h2 class="section__title" data-i18n="rsvpTitle">Тойго келесизби?</h2>
+        <p class="section__sub" data-i18n="rsvpSub">Жообуңузду алдын ала билдирип коюңуз</p>
 
         <form id="rsvp-form" class="form" novalidate>
           <label class="field">
-            <span>Аты-жөнүңүз</span>
-            <input type="text" name="name" required placeholder="Мисалы: Айбек Асанов" autocomplete="name">
-            <small>Жубайыңыз менен келе турчу болсоңуз, анын да атын кошо жазып кетиңиз</small>
+            <span data-i18n="nameLabel">Аты-жөнүңүз</span>
+            <input type="text" name="name" required placeholder="Мисалы: Айбек Асанов" data-i18n-ph="namePh" autocomplete="name">
+            <small data-i18n="nameHint">Жубайыңыз менен келе турчу болсоңуз, анын да атын кошо жазып кетиңиз</small>
           </label>
           <fieldset class="field field--radio">
-            <legend>Тойго келесизби?</legend>
-            <label class="choice"><input type="radio" name="attend" value="yes" checked><span>Келемин 🥰</span></label>
-            <label class="choice"><input type="radio" name="attend" value="both"><span>Жубайым менен келемин 👫</span></label>
-            <label class="choice"><input type="radio" name="attend" value="no"><span>Келе албаймын 😔</span></label>
+            <legend data-i18n="rsvpTitle">Тойго келесизби?</legend>
+            <label class="choice"><input type="radio" name="attend" value="yes" checked><span data-i18n="yes">Келемин 🥰</span></label>
+            <label class="choice"><input type="radio" name="attend" value="both"><span data-i18n="both">Жубайым менен келемин 👫</span></label>
+            <label class="choice"><input type="radio" name="attend" value="no"><span data-i18n="no">Келе албаймын 😔</span></label>
           </fieldset>
-          <button id="rsvp-submit" class="btn btn--gold" type="submit"><span>Жөнөтүү</span></button>
+          <button id="rsvp-submit" class="btn btn--gold" type="submit"><span data-i18n="submit">Жөнөтүү</span></button>
           <p class="form__note" id="form-note"></p>
         </form>
 
         <div id="rsvp-success" class="success" hidden>
           <div class="success__icon">♥</div>
-          <h3>Рахмат!</h3>
-          <p>Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.</p>
+          <h3 data-i18n="thanks">Рахмат!</h3>
+          <p data-i18n-html="received">Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.</p>
         </div>
       </div>
     </section>

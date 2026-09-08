@@ -13,11 +13,49 @@
   const toTop = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   toTop(); addEventListener("load", toTop); addEventListener("pageshow", toTop);
 
+  /* ---------- Тил / Язык ---------- */
+  const T = {
+    ky: {
+      tap: "Чакырууну ачуу үчүн басыңыз", heroKicker: "Үйлөнүү той", titleSuffix: "Үйлөнүү той",
+      kInvite: "Чакыруу", kDate: "Той салтанаты", at: "саат", toy: "Той", late: "Той убактысынан кечикпеңиздер!", calBtn: "📅 Календарга кошуу",
+      kCountdown: "Тойго чейин", countdownTitle: "Калды", days: "күн", hours: "саат", minutes: "мүнөт", seconds: "секунд", done: "Бул күн келди! ♥",
+      kVenue: "Дарегибиз", routeBtn: "📍 Картадан кароо", kHosts: "Той ээлери", hostsText: "Сиздерди ак дасторконубуздун кадырлуу коногу болууга чакырабыз",
+      kNotes: "Эскертүү", notesTitle: "Маанилүү маалымат", kRsvp: "Суроо", rsvpTitle: "Тойго келесизби?", rsvpSub: "Жообуңузду алдын ала билдирип коюңуз",
+      nameLabel: "Аты-жөнүңүз", namePh: "Мисалы: Айбек Асанов", nameHint: "Жубайыңыз менен келе турчу болсоңуз, анын да атын кошо жазып кетиңиз",
+      yes: "Келемин 🥰", both: "Жубайым менен келемин 👫", no: "Келе албаймын 😔", submit: "Жөнөтүү", sending: "Жөнөтүлүүдө…",
+      err: "Ката кетти. Кайра аракет кылыңыз же WhatsApp аркылуу жазыңыз.", thanks: "Рахмат!", received: "Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.",
+      labels: { yes: "Келемин", both: "Жубайым менен келемин", no: "Келе албаймын" },
+      wa: (g, b) => `Саламатсызбы! ${g} менен ${b} үйлөнүү тоюна жооп 💍`, waName: "Аты-жөнү", waAnswer: "Жооп", calTitle: (g, b) => `${g} & ${b} — үйлөнүү той`,
+      months: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"],
+      weekdays: ["Жекшемби", "Дүйшөмбү", "Шейшемби", "Шаршемби", "Бейшемби", "Жума", "Ишемби"],
+      dow: ["Дүй", "Шей", "Шар", "Бей", "Жум", "Ише", "Жек"],
+      dateLong: (d, m, y) => `${d}-${m} ${y}-жыл`, calMonth: (m, y) => `${m[0].toUpperCase() + m.slice(1)} ${y}`,
+    },
+    ru: {
+      tap: "Нажмите, чтобы открыть приглашение", heroKicker: "Свадьба", titleSuffix: "Свадьба",
+      kInvite: "Приглашение", kDate: "Торжество", at: "в", toy: "Торжество", late: "Пожалуйста, не опаздывайте!", calBtn: "📅 Добавить в календарь",
+      kCountdown: "До торжества", countdownTitle: "Осталось", days: "дней", hours: "часов", minutes: "минут", seconds: "секунд", done: "Этот день настал! ♥",
+      kVenue: "Адрес", routeBtn: "📍 Открыть карту", kHosts: "Хозяева торжества", hostsText: "Приглашаем вас стать почётными гостями нашего торжества",
+      kNotes: "Важно", notesTitle: "Полезная информация", kRsvp: "Ответ", rsvpTitle: "Вы придёте?", rsvpSub: "Пожалуйста, ответьте заранее",
+      nameLabel: "Ваше имя и фамилия", namePh: "Например: Айбек Асанов", nameHint: "Если придёте с супругом(ой), укажите и его/её имя",
+      yes: "Приду 🥰", both: "Приду с супругом(ой) 👫", no: "К сожалению, не смогу 😔", submit: "Отправить", sending: "Отправляем…",
+      err: "Ошибка. Попробуйте ещё раз или напишите в WhatsApp.", thanks: "Спасибо!", received: "Ваш ответ принят.<br>Ждём вас на торжестве.",
+      labels: { yes: "Приду", both: "Приду с супругом(ой)", no: "Не смогу" },
+      wa: (g, b) => `Здравствуйте! Ответ на приглашение на свадьбу ${g} и ${b} 💍`, waName: "Имя", waAnswer: "Ответ", calTitle: (g, b) => `${g} & ${b} — свадьба`,
+      months: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+      monthsNom: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+      weekdays: ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"],
+      dow: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+      dateLong: (d, m, y) => `${d} ${m} ${y} года`, calMonth: (m, y, i) => `${T.ru.monthsNom[i]} ${y}`,
+    },
+  };
+  let LANG = "ky";
+  try { const saved = localStorage.getItem("lang"); if (saved === "ru" || saved === "ky") LANG = saved; } catch (e) {}
+  const t = (k) => (T[LANG][k] !== undefined ? T[LANG][k] : T.ky[k]);
+  // Орусча тексттер config.ru ичинде / Русские тексты лежат в config.ru
+  const cfgL = (k) => (LANG === "ru" && CFG.ru && CFG.ru[k] !== undefined && CFG.ru[k] !== "" ? CFG.ru[k] : CFG[k]);
+
   /* ---------- Күн / Дата ---------- */
-  const MONTHS = ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"];
-  const MONTHS_CAP = MONTHS.map((m) => m[0].toUpperCase() + m.slice(1));
-  const WEEKDAYS = ["Жекшемби", "Дүйшөмбү", "Шейшемби", "Шаршемби", "Бейшемби", "Жума", "Ишемби"];
-  const DOW_SHORT = ["Дүй", "Шей", "Шар", "Бей", "Жум", "Ише", "Жек"];
   const [Y, M, D] = (CFG.date || "2026-10-10").split("-").map(Number);
   const [hh, mm] = (CFG.timeStart || "17:00").split(":").map(Number);
   const eventDate = new Date(Y, M - 1, D, hh, mm, 0);
@@ -26,22 +64,30 @@
   // Шаблондогу {groom}, {bride} ж.б. алмаштыруу
   const fill = (s) => String(s || "").replace(/\{(\w+)\}/g, (_, k) => (CFG[k] !== undefined ? CFG[k] : `{${k}}`));
 
-  const values = {
-    groom: CFG.groom, bride: CFG.bride,
-    hostFather: CFG.hostFather, hostMother: CFG.hostMother,
-    dateDay: pad2(D), dateMonth: pad2(M), dateYear: String(Y),
-    dateLong: `${D}-${MONTHS[M - 1]} ${Y}-жыл`,
-    weekday: WEEKDAYS[eventDate.getDay()],
-    timeStart: CFG.timeStart, timeEnd: CFG.timeEnd,
-    region: CFG.region, venueName: CFG.venueName, venueAddress: CFG.venueAddress,
-    addressLine: [CFG.region, CFG.venueAddress].filter(Boolean).join(", "),
-    inviteTitle: CFG.inviteTitle, inviteText: fill(CFG.inviteText), closingText: CFG.closingText,
-  };
-  $$("[data-cfg]").forEach((el) => {
-    const v = values[el.dataset.cfg];
-    if (v !== undefined && v !== null && v !== "") el.textContent = v;
-  });
-  document.title = `${CFG.groom} & ${CFG.bride} — Үйлөнүү той`;
+  let values = {};
+  function computeValues() {
+    values = {
+      groom: CFG.groom, bride: CFG.bride,
+      hostFather: CFG.hostFather, hostMother: CFG.hostMother,
+      dateDay: pad2(D), dateMonth: pad2(M), dateYear: String(Y),
+      dateLong: t("dateLong")(D, t("months")[M - 1], Y),
+      weekday: t("weekdays")[eventDate.getDay()],
+      timeStart: CFG.timeStart, timeEnd: CFG.timeEnd,
+      region: cfgL("region"), venueName: cfgL("venueName"), venueAddress: cfgL("venueAddress"),
+      addressLine: [cfgL("region"), cfgL("venueAddress")].filter(Boolean).join(", "),
+      inviteTitle: cfgL("inviteTitle"), inviteText: fill(cfgL("inviteText")), closingText: cfgL("closingText"),
+    };
+  }
+  function fillValues() {
+    $$("[data-cfg]").forEach((el) => {
+      if (el.querySelector(".ch")) return; // аттар тамга-тамга бөлүнгөн / имена уже разбиты по буквам
+      const v = values[el.dataset.cfg];
+      if (v !== undefined && v !== null && v !== "") el.textContent = v;
+    });
+    document.title = `${CFG.groom} & ${CFG.bride} — ${t("titleSuffix")}`;
+    document.documentElement.lang = LANG;
+  }
+  computeValues(); fillValues();
 
   /* ---------- Тамга-тамга / Побуквенное появление имён ---------- */
   function splitLetters(el, base) {
@@ -57,17 +103,16 @@
       el.appendChild(s);
     });
   }
-  $$(".intro__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.5 + i * 0.45}s`));
-  $("#seal-text").innerHTML = `${(CFG.groom || "")[0] || ""}<i>&amp;</i>${(CFG.bride || "")[0] || ""}`;
   // Календарга кошуу / Добавить в календарь (Google Calendar)
-  (function calendarLink() {
+  function calendarLink() {
     const a = $("#cal-btn"); if (!a) return;
     const [eh, em] = (CFG.timeEnd || "23:00").split(":").map(Number);
     const f = (d) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
     const end = new Date(Y, M - 1, D, eh, em, 0);
-    const p = new URLSearchParams({ action: "TEMPLATE", text: `${CFG.groom} & ${CFG.bride} — үйлөнүү той`, dates: `${f(eventDate)}/${f(end)}`, details: location.href, location: values.addressLine ? `${CFG.venueName}, ${values.addressLine}` : CFG.venueName || "" });
+    const p = new URLSearchParams({ action: "TEMPLATE", text: t("calTitle")(CFG.groom, CFG.bride), dates: `${f(eventDate)}/${f(end)}`, details: location.href, location: values.addressLine ? `${values.venueName}, ${values.addressLine}` : values.venueName || "" });
     a.href = `https://calendar.google.com/calendar/render?${p}`;
-  })();
+  }
+  calendarLink();
   $$(".hero__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.4 + i * 0.6}s`));
   $$(".hosts__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.3 + i * 0.5}s`));
 
@@ -76,7 +121,8 @@
     const words = el.textContent.trim().split(/\s+/); el.textContent = "";
     words.forEach((w, i) => { const s = document.createElement("span"); s.className = "word"; s.style.setProperty("--w", i); s.textContent = w; el.appendChild(s); el.appendChild(document.createTextNode(" ")); });
   }
-  $$('.lead[data-cfg="inviteText"], .hosts__text, .footer__text').forEach(splitWords);
+  const WORD_ELS = '.lead[data-cfg="inviteText"], .hosts__text, .footer__text';
+  $$(WORD_ELS).forEach(splitWords);
   // Веточка-разделитель над каждой секцией
   const DIVIDER = '<path d="M4 16 C 50 4, 90 26, 130 15 S 210 4, 256 16"/><path d="M60 13 c -6 -8 -4 -14 4 -16 c 2 8 0 13 -4 16 Z"/><path d="M118 17 c 6 6 4 13 -3 15 c -2 -7 0 -12 3 -15 Z"/><path d="M186 12 c -6 -8 -4 -14 4 -16 c 2 8 0 13 -4 16 Z"/><path d="M130 15 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0"/>';
   $$(".section .container.reveal").forEach((c) => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("class", "divider"); s.setAttribute("viewBox", "0 0 260 28"); s.innerHTML = DIVIDER; c.insertBefore(s, c.firstChild); });
@@ -84,6 +130,7 @@
 
   /* ---------- Параллакс, боке, наклон, волна ---------- */
   const hero = $(".hero");
+  if (CFG.heroImage) { hero.style.setProperty("--hero-img", `url("${CFG.heroImage}")`); hero.classList.add("has-photo"); }
   [1, 2, 3].forEach((i) => { const b = document.createElement("div"); b.className = `hero__bokeh hero__bokeh--${i}`; hero.insertBefore(b, hero.firstChild); });
   let syTick = false;
   addEventListener("scroll", () => {
@@ -112,12 +159,16 @@
 
   /* ---------- Эскертүүлөр ---------- */
   const notes = $("#notes");
-  (CFG.notes || []).forEach((n, i) => {
-    const d = document.createElement("div");
-    d.className = "note"; d.style.transitionDelay = `${i * 0.12}s`;
-    d.innerHTML = `<div class="note__icon">${n.icon || "✨"}</div><p>${fill(n.text)}</p>`;
-    notes.appendChild(d);
-  });
+  function renderNotes() {
+    notes.innerHTML = "";
+    (cfgL("notes") || []).forEach((n, i) => {
+      const d = document.createElement("div");
+      d.className = "note"; d.style.transitionDelay = `${i * 0.12}s`;
+      d.innerHTML = `<div class="note__icon">${n.icon || "✨"}</div><p>${fill(n.text)}</p>`;
+      notes.appendChild(d);
+    });
+  }
+  renderNotes();
 
   /* ---------- Карта ---------- */
   const coords = (CFG.coords || "").replace(/\s+/g, "");
@@ -126,13 +177,13 @@
   $("#route-btn").href = CFG.routeUrl || (coords ? `https://www.google.com/maps/dir/?api=1&destination=${coords}` : `https://www.google.com/maps/search/?api=1&query=${q}`);
 
   /* ---------- Календарь ---------- */
-  (function buildCalendar() {
+  function buildCalendar() {
     const first = new Date(Y, M - 1, 1);
     const daysIn = new Date(Y, M, 0).getDate();
     let offset = first.getDay() - 1; if (offset < 0) offset = 6; // дүйшөмбүдөн башталат
-    let html = `<div class="calendar__month">${MONTHS_CAP[M - 1]} ${Y}</div><div class="calendar__grid">`;
+    let html = `<div class="calendar__month">${t("calMonth")(t("months")[M - 1], Y, M - 1)}</div><div class="calendar__grid">`;
     let idx = 0;
-    DOW_SHORT.forEach((d) => (html += `<div class="dow" style="--i:${idx++}">${d}</div>`));
+    t("dow").forEach((d) => (html += `<div class="dow" style="--i:${idx++}">${d}</div>`));
     for (let i = 0; i < offset; i++) html += `<div style="--i:${idx++}"></div>`;
     for (let d = 1; d <= daysIn; d++) {
       const dow = (offset + d - 1) % 7;
@@ -140,7 +191,8 @@
       html += `<div class="${cls}" style="--i:${idx++}">${d}</div>`;
     }
     $("#calendar").innerHTML = html + "</div>";
-  })();
+  }
+  buildCalendar();
 
   /* ---------- Тойго чейин ---------- */
   (function countdown() {
@@ -154,7 +206,7 @@
     function parts() { const s = Math.max(0, Math.floor((eventDate - new Date()) / 1000)); return [Math.floor(s / 86400), Math.floor((s % 86400) / 3600), Math.floor((s % 3600) / 60), s % 60]; }
     function show(v) { set(u.days, v[0]); set(u.hours, v[1]); set(u.minutes, v[2]); set(u.seconds, v[3]); }
     function tick() {
-      if (eventDate - new Date() <= 0) { box.innerHTML = '<div class="countdown--done">Бул күн келди! ♥</div>'; return; }
+      if (eventDate - new Date() <= 0) { box.innerHTML = `<div class="countdown--done">${t("done")}</div>`; return; }
       if (!rolling) show(parts());
       setTimeout(tick, 1000 - (Date.now() % 1000));
     }
@@ -233,12 +285,11 @@
   const env = $("#env");
   function openInvite() {
     if (env.classList.contains("is-open")) return;
-    env.classList.add("is-open"); // 1) печать → клапан → карточка выезжает
+    env.classList.add("is-open"); // печать тайып, клапан ачылат / печать исчезает, клапан открывается, створки разъезжаются
     play();
-    setTimeout(() => intro.classList.add("is-opening"), 1500); // 2) занавес
-    setTimeout(() => { document.body.classList.remove("locked"); document.body.classList.add("opened"); startPetals(); }, 1950);
-    setTimeout(() => { musicBtn.classList.add("is-visible"); }, 2900);
-    setTimeout(() => { intro.classList.add("is-hidden"); stopDust(); }, 3400);
+    setTimeout(() => { document.body.classList.remove("locked"); document.body.classList.add("opened"); startPetals(); }, 700);
+    setTimeout(() => { musicBtn.classList.add("is-visible"); }, 1500);
+    setTimeout(() => { intro.classList.add("is-hidden"); stopDust(); }, 1700);
     removeEventListener("wheel", onWheel); removeEventListener("keydown", onKey);
   }
   const onWheel = (e) => { if (e.deltaY > 0) openInvite(); };
@@ -272,8 +323,8 @@
         if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
         const a = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(p.t * 2));
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(201,175,120,${a})`; ctx.fill();
-        if (p.r > 1.6 * dpr) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2); ctx.fillStyle = `rgba(201,175,120,${a * 0.12})`; ctx.fill(); }
+        ctx.fillStyle = `rgba(255,248,225,${a})`; ctx.fill();
+        if (p.r > 1.6 * dpr) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,248,225,${a * 0.12})`; ctx.fill(); }
       });
       raf = requestAnimationFrame(draw);
     }
@@ -332,7 +383,6 @@
   }
 
   /* ---------- Суроо (RSVP) ---------- */
-  const LABELS = { yes: "Келемин", both: "Жубайым менен келемин", no: "Келе албаймын" };
   const form = $("#rsvp-form"), note = $("#form-note"), submitBtn = $("#rsvp-submit");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -343,26 +393,22 @@
     const attend = form.attend.value;
 
     if (CFG.googleScriptUrl) {
-      submitBtn.disabled = true; note.textContent = "Жөнөтүлүүдө…";
+      submitBtn.disabled = true; note.textContent = t("sending");
       try {
         await fetch(CFG.googleScriptUrl, {
           method: "POST", mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ name, rsvp: attend, rsvpLabel: LABELS[attend], timestamp: new Date().toISOString(), userAgent: navigator.userAgent }),
+          body: JSON.stringify({ name, rsvp: attend, rsvpLabel: T.ky.labels[attend], lang: LANG, timestamp: new Date().toISOString(), userAgent: navigator.userAgent }),
         });
         showSuccess();
       } catch (err) {
-        note.textContent = "Ката кетти. Кайра аракет кылыңыз же WhatsApp аркылуу жазыңыз.";
+        note.textContent = t("err");
         submitBtn.disabled = false;
       }
       return;
     }
     // WhatsApp аркылуу
-    const text = [
-      `Саламатсызбы! ${CFG.groom} менен ${CFG.bride} үйлөнүү тоюна жооп 💍`,
-      `Аты-жөнү: ${name}`,
-      `Жооп: ${LABELS[attend]}`,
-    ].join("\n");
+    const text = [t("wa")(CFG.groom, CFG.bride), `${t("waName")}: ${name}`, `${t("waAnswer")}: ${t("labels")[attend]}`].join("\n");
     window.open(`https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
     showSuccess();
   });
@@ -371,4 +417,20 @@
     form.hidden = true;
     const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
   }
+
+  /* ---------- Тилди алмаштыруу / Переключение языка ---------- */
+  function applyLang(lang, first) {
+    LANG = lang;
+    try { localStorage.setItem("lang", lang); } catch (e) {}
+    $$("[data-i18n]").forEach((el) => { const v = t(el.dataset.i18n); if (typeof v === "string") el.textContent = v; });
+    $$("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+    $$("[data-i18n-html]").forEach((el) => { el.innerHTML = t(el.dataset.i18nHtml); });
+    $$("#lang button").forEach((b) => b.classList.toggle("is-active", b.dataset.lang === lang));
+    if (first) return;
+    computeValues(); fillValues(); renderNotes(); buildCalendar(); calendarLink();
+    $$(WORD_ELS).forEach(splitWords);
+    if (!document.body.classList.contains("locked")) $$(".reveal.is-visible").forEach((r) => { r.classList.remove("is-visible"); void r.offsetWidth; r.classList.add("is-visible"); });
+  }
+  $$("#lang button").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); if (b.dataset.lang !== LANG) applyLang(b.dataset.lang); }));
+  if (LANG !== "ky") applyLang(LANG); else applyLang("ky", true);
 })();
