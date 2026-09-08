@@ -383,6 +383,15 @@
   }
 
   /* ---------- Суроо (RSVP) ---------- */
+  // Telegram аркылуу: жооп ээлерине өзү келет / Ответ приходит хозяевам в Telegram автоматически
+  async function sendTelegram(text) {
+    const tg = CFG.telegram || {}; if (!tg.token || !tg.chatId) return false;
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${tg.token}/sendMessage`, { method: "POST", body: new URLSearchParams({ chat_id: tg.chatId, text }) });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
   const form = $("#rsvp-form"), note = $("#form-note"), submitBtn = $("#rsvp-submit");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -391,6 +400,14 @@
     if (!name) { nameField.classList.add("is-error"); form.name.focus(); return; }
     nameField.classList.remove("is-error");
     const attend = form.attend.value;
+    const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
+    const tgText = `💌 Жаңы жооп / Новый ответ\n👤 ${name}\n✅ ${T.ky.labels[attend]} / ${T.ru.labels[attend]}\n🕒 ${stamp}`;
+
+    if (CFG.telegram && CFG.telegram.token && CFG.telegram.chatId) {
+      submitBtn.disabled = true; note.textContent = t("sending");
+      if (await sendTelegram(tgText)) { showSuccess(); return; }
+      submitBtn.disabled = false; note.textContent = "";
+    }
 
     if (CFG.googleScriptUrl) {
       submitBtn.disabled = true; note.textContent = t("sending");
