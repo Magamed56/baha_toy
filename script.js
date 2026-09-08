@@ -16,7 +16,7 @@
   /* ---------- Тил / Язык ---------- */
   const T = {
     ky: {
-      tap: "Чакырууну ачуу үчүн басыңыз", heroKicker: "Үйлөнүү той", titleSuffix: "Үйлөнүү той",
+      tap: "Чакырууну ачуу үчүн басыңыз", heroKicker: "Үйлөнүү той", titleSuffix: "Үйлөнүү той", dear: "Урматтуу {name}!",
       kInvite: "Чакыруу", kDate: "Той салтанаты", at: "саат", toy: "Той", late: "Той убактысынан кечикпеңиздер!", calBtn: "📅 Календарга кошуу",
       kCountdown: "Тойго чейин", countdownTitle: "Калды", days: "күн", hours: "саат", minutes: "мүнөт", seconds: "секунд", done: "Бул күн келди! ♥",
       kVenue: "Дарегибиз", routeBtn: "📍 Картадан кароо", kHosts: "Той ээлери", hostsText: "Сиздерди ак дасторконубуздун кадырлуу коногу болууга чакырабыз",
@@ -32,7 +32,7 @@
       dateLong: (d, m, y) => `${d}-${m} ${y}-жыл`, calMonth: (m, y) => `${m[0].toUpperCase() + m.slice(1)} ${y}`,
     },
     ru: {
-      tap: "Нажмите, чтобы открыть приглашение", heroKicker: "Свадьба", titleSuffix: "Свадьба",
+      tap: "Нажмите, чтобы открыть приглашение", heroKicker: "Свадьба", titleSuffix: "Свадьба", dear: "Дорогие {name}!",
       kInvite: "Приглашение", kDate: "Торжество", at: "в", toy: "Торжество", late: "Пожалуйста, не опаздывайте!", calBtn: "📅 Добавить в календарь",
       kCountdown: "До торжества", countdownTitle: "Осталось", days: "дней", hours: "часов", minutes: "минут", seconds: "секунд", done: "Этот день настал! ♥",
       kVenue: "Адрес", routeBtn: "📍 Открыть карту", kHosts: "Хозяева торжества", hostsText: "Приглашаем вас стать почётными гостями нашего торжества",
@@ -111,8 +111,19 @@
     const end = new Date(Y, M - 1, D, eh, em, 0);
     const p = new URLSearchParams({ action: "TEMPLATE", text: t("calTitle")(CFG.groom, CFG.bride), dates: `${f(eventDate)}/${f(end)}`, details: location.href, location: values.addressLine ? `${values.venueName}, ${values.addressLine}` : values.venueName || "" });
     a.href = `https://calendar.google.com/calendar/render?${p}`;
+    // iPhone: .ics файл ачылат жана календарга кошулат / на iPhone .ics открывает системный календарь
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) { a.href = "assets/toy.ics"; a.removeAttribute("target"); }
   }
   calendarLink();
+  // Жеке кайрылуу: ?g=Аты / Персональное обращение через ссылку ?g=Имя
+  const GUEST = (new URLSearchParams(location.search).get("g") || "").trim().slice(0, 60);
+  function applyGuest() {
+    const el = $("#guest"); if (!el) return;
+    if (!GUEST) { el.hidden = true; return; }
+    el.textContent = t("dear").replace("{name}", GUEST); el.hidden = false;
+    const inp = $("#rsvp-form input[name=name]"); if (inp && !inp.value) inp.value = GUEST;
+  }
+  applyGuest();
   $$(".hero__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.4 + i * 0.6}s`));
   $$(".hosts__names [data-cfg]").forEach((el, i) => splitLetters(el, `${0.3 + i * 0.5}s`));
 
@@ -426,8 +437,8 @@
     }
     // WhatsApp аркылуу
     const text = [t("wa")(CFG.groom, CFG.bride), `${t("waName")}: ${name}`, `${t("waAnswer")}: ${t("labels")[attend]}`].join("\n");
-    window.open(`https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
     showSuccess();
+    setTimeout(() => { location.href = `https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`; }, 400);
   });
   function showSuccess() {
     if (window.__burst) { const r = $("#rsvp").getBoundingClientRect(); window.__burst(innerWidth / 2 * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), Math.min(innerHeight, Math.max(0, r.top + 200)) * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), 90); }
@@ -444,7 +455,7 @@
     $$("[data-i18n-html]").forEach((el) => { el.innerHTML = t(el.dataset.i18nHtml); });
     $$("#lang button").forEach((b) => b.classList.toggle("is-active", b.dataset.lang === lang));
     if (first) return;
-    computeValues(); fillValues(); renderNotes(); buildCalendar(); calendarLink();
+    computeValues(); fillValues(); renderNotes(); buildCalendar(); calendarLink(); applyGuest();
     $$(WORD_ELS).forEach(splitWords);
     if (!document.body.classList.contains("locked")) $$(".reveal.is-visible").forEach((r) => { r.classList.remove("is-visible"); void r.offsetWidth; r.classList.add("is-visible"); });
   }

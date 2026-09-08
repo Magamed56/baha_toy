@@ -185,6 +185,8 @@ a { color: inherit; }
 .mountains { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(110px, 22vw, 220px); color: var(--sepia); }
 .mountains--footer { top: 0; bottom: auto; transform: scaleY(-1); opacity: .6; }
 
+.hero__guest { font-family: var(--script); font-size: clamp(1.5rem, 5.5vw, 2.2rem); color: var(--sepia); margin-bottom: .3rem; opacity: 0; transition: opacity 1s .2s; }
+.hero.is-visible .hero__guest { opacity: 1; }
 /* ---------- Календарь ---------- */
 .cal { display: inline-block; padding: 1rem 1rem 1.2rem; background: var(--paper); border: 1px solid var(--line); }
 .cal__month { font-family: var(--display); font-style: italic; font-size: 1.4rem; color: var(--ink); margin-bottom: .6rem; }

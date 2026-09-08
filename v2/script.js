@@ -74,6 +74,13 @@
     const end = new Date(Y, M - 1, D, eh, em, 0);
     const p = new URLSearchParams({ action: "TEMPLATE", text: `${CFG.groom} & ${CFG.bride} — үйлөнүү той`, dates: `${f(eventDate)}/${f(end)}`, details: location.href, location: values.addressLine ? `${CFG.venueName}, ${values.addressLine}` : CFG.venueName || "" });
     a.href = `https://calendar.google.com/calendar/render?${p}`;
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) { a.href = "../assets/toy.ics"; a.removeAttribute("target"); }
+  })();
+  // Жеке кайрылуу / Персональное обращение через ссылку ?g=Имя
+  (function guest() {
+    const g = (new URLSearchParams(location.search).get("g") || "").trim().slice(0, 60); const el = $("#guest");
+    if (!g || !el) return; el.textContent = `Урматтуу ${g}!`; el.hidden = false;
+    const inp = $("#rsvp-form input[name=name]"); if (inp && !inp.value) inp.value = g;
   })();
 
   /* ---------- SVG жардамчылар ---------- */
@@ -488,8 +495,8 @@
       return;
     }
     const text = [`Саламатсызбы! ${CFG.groom} менен ${CFG.bride} үйлөнүү тоюна жооп 💍`, `Аты-жөнү: ${name}`, `Жооп: ${LABELS[attend]}`].join("\n");
-    window.open(`https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
     showSuccess();
+    setTimeout(() => { location.href = `https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`; }, 400);
   });
   function showSuccess() {
     form.hidden = true; const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
