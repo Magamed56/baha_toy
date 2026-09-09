@@ -304,3 +304,5 @@ a { color: inherit; }
 .progress { position: fixed; top: 0; left: 0; height: 2px; width: 100%; transform: scaleX(var(--sp, 0)); transform-origin: left; background: var(--ink-soft); z-index: 95; pointer-events: none; }
 .music-btn.is-playing::before { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid var(--sepia); animation: inkPulse2 2.2s ease-out infinite; }
 @keyframes inkPulse2 { 0% { transform: scale(.9); opacity: .9; } 100% { transform: scale(1.35); opacity: 0; } }
+
+.form[hidden], .success[hidden] { display: none !important; }

@@ -355,3 +355,5 @@ body.opened .hero__names::after, .is-visible .footer__names::after { animation-p
 @keyframes waveDrift { to { transform: translateX(-50%); } }
 .section, .footer { position: relative; }
 @media (prefers-reduced-motion: reduce) { .wave svg { animation: none; } }
+
+.form[hidden], .success[hidden] { display: none !important; }
