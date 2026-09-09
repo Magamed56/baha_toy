@@ -394,6 +394,13 @@
   }
 
   /* ---------- Суроо (RSVP) ---------- */
+  // CallMeBot аркылуу: жооп ээлердин WhatsApp'ына өзү келет / Ответ приходит хозяевам в WhatsApp автоматически
+  function sendCallMeBot(text) {
+    const c = CFG.callmebot || {}; if (!c.phone || !c.apikey) return false;
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(String(c.phone).replace(/\D/g, ""))}&apikey=${encodeURIComponent(c.apikey)}&text=${encodeURIComponent(text)}`;
+    try { fetch(url, { mode: "no-cors", cache: "no-store" }).catch(() => {}); new Image().src = url; return true; } catch (e) { return false; }
+  }
+
   // Telegram аркылуу: жооп ээлерине өзү келет / Ответ приходит хозяевам в Telegram автоматически
   async function sendTelegram(text) {
     const tg = CFG.telegram || {}; if (!tg.token || !tg.chatId) return false;
@@ -414,6 +421,11 @@
     const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
     const tgText = `💌 Жаңы жооп / Новый ответ\n👤 ${name}\n✅ ${T.ky.labels[attend]} / ${T.ru.labels[attend]}\n🕒 ${stamp}`;
 
+    if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
+      submitBtn.disabled = true; note.textContent = t("sending");
+      if (sendCallMeBot(tgText)) { setTimeout(showSuccess, 900); return; }
+      submitBtn.disabled = false; note.textContent = "";
+    }
     if (CFG.telegram && CFG.telegram.token && CFG.telegram.chatId) {
       submitBtn.disabled = true; note.textContent = t("sending");
       if (await sendTelegram(tgText)) { showSuccess(); return; }
