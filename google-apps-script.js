@@ -4,22 +4,25 @@
  *
  * Орнотуу / Установка:
  *  1. Создайте новую Google Таблицу.
- *  2. Расширения → Apps Script. Удалите всё и вставьте этот файл. Сохраните.
+ *  2. Расширения → Apps Script. Удалите всё и вставьте этот файл. Сохраните (иконка дискеты).
  *  3. Развернуть → Новое развёртывание → Тип: «Веб-приложение».
- *     Выполнять от имени: «Я». Доступ: «Все». Нажмите «Развернуть».
- *  4. Скопируйте URL веб-приложения и вставьте в config.js → googleScriptUrl.
+ *     Выполнять от имени: «Я». У кого есть доступ: «Все». Нажмите «Развернуть», разрешите доступ.
+ *  4. Скопируйте URL веб-приложения (…/exec) и вставьте в config.js → googleScriptUrl.
  */
-const SHEET_NAME = "Жооптор";
+var SHEET_NAME = "Жооптор";
 
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
-    const sheet = getOrCreateSheet();
+    var data = JSON.parse(e.postData.contents);
+    var sheet = getOrCreateSheet();
     sheet.appendRow([
       new Date(data.timestamp || Date.now()),
       data.name || "",
       data.rsvpLabel || getLabel(data.rsvp),
+      Number(data.guests || 0),
+      data.wish || "",
       data.rsvp || "",
+      data.lang || "",
       data.userAgent || "",
     ]);
     return ContentService.createTextOutput(JSON.stringify({ success: true })).setMimeType(ContentService.MimeType.JSON);
@@ -33,30 +36,25 @@ function doGet() {
 }
 
 function getOrCreateSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(SHEET_NAME);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    const headers = ["Убакыт", "Аты-жөнү", "Жооп", "Код", "Түзмөк"];
+    var headers = ["Убакыт", "Аты-жөнү", "Жооп", "Адам саны", "Каалоо", "Код", "Тил", "Түзмөк"];
     sheet.appendRow(headers);
-    const h = sheet.getRange(1, 1, 1, headers.length);
+    var h = sheet.getRange(1, 1, 1, headers.length);
     h.setFontWeight("bold").setBackground("#4C463F").setFontColor("#FAF9F7");
-    sheet.setColumnWidths(1, 1, 170); sheet.setColumnWidth(2, 260); sheet.setColumnWidth(3, 220);
+    sheet.setColumnWidth(1, 170); sheet.setColumnWidth(2, 240); sheet.setColumnWidth(3, 200); sheet.setColumnWidth(5, 320);
     sheet.setFrozenRows(1);
+    // Жыйынтык / Итоги справа
+    sheet.getRange("J1").setValue("Келет (жооп)"); sheet.getRange("K1").setFormula('=COUNTIF(F:F;"yes")+COUNTIF(F:F;"both")');
+    sheet.getRange("J2").setValue("Келбейт"); sheet.getRange("K2").setFormula('=COUNTIF(F:F;"no")');
+    sheet.getRange("J3").setValue("Адам саны"); sheet.getRange("K3").setFormula('=SUM(D:D)');
+    sheet.getRange("J1:J3").setFontWeight("bold");
   }
   return sheet;
 }
 
 function getLabel(code) {
   return { yes: "Келемин", both: "Жубайым менен келемин", no: "Келе албаймын" }[code] || code || "";
-}
-
-/** Статистика — запустить вручную в редакторе Apps Script. */
-function getStats() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  if (!sheet) return Logger.log("Жооптор жок");
-  const rows = sheet.getDataRange().getValues().slice(1);
-  const c = { yes: 0, both: 0, no: 0 };
-  rows.forEach((r) => { if (c[r[3]] !== undefined) c[r[3]]++; });
-  Logger.log(`Келет: ${c.yes}, Жубайы менен: ${c.both}, Келбейт: ${c.no}, Болжолдуу конок: ${c.yes + c.both * 2}`);
 }

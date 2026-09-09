@@ -461,6 +461,12 @@
   if (document.fonts) document.fonts.ready.then(() => { if (!document.body.classList.contains("locked")) buildRoute(); });
 
   /* ---------- Суроо (RSVP) ---------- */
+  // Google Таблица (Apps Script): жоопторду таблицага жазуу / запись каждого ответа в таблицу
+  function recordSheet(payload) {
+    if (!CFG.googleScriptUrl) return Promise.resolve(false);
+    return fetch(CFG.googleScriptUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) }).then(() => true).catch(() => false);
+  }
+
   // Google Форма: жоопторду таблицага жазуу / записать ответ в таблицу Google Формы (фоново)
   function recordGoogleForm(name, answer) {
     const g = CFG.googleForm || {}; if (!g.action || !g.nameEntry || !g.answerEntry) return;
@@ -499,6 +505,7 @@
     const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
     const tgText = [`💌 Жаңы жооп / Новый ответ`, `👤 ${name}`, attend === "no" ? `❌ ${LABELS.no}` : `✅ ${LABELS[attend]} · 👥 ${guests}`, wish ? `💬 ${wish}` : null, `${attend === "no" ? "#келбейм" : "#келем"}${guests ? " · " + guests + " адам" : ""}`, `🕒 ${stamp}`].filter(Boolean).join("\n");
     lastAnswer = { name, attend, guests, wish };
+    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: LABELS[attend], guests, wish, lang: "ky", timestamp: new Date().toISOString(), userAgent: navigator.userAgent });
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = "Жөнөтүлүүдө…";
       if (sendCallMeBot(tgText)) { setTimeout(showSuccess, 900); return; }
@@ -511,12 +518,7 @@
     }
     if (CFG.googleScriptUrl) {
       submitBtn.disabled = true; note.textContent = "Жөнөтүлүүдө…";
-      try {
-        await fetch(CFG.googleScriptUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ name, rsvp: attend, rsvpLabel: LABELS[attend], timestamp: new Date().toISOString(), userAgent: navigator.userAgent }) });
-        showSuccess();
-      } catch (err) { note.textContent = "Ката кетти. Кайра аракет кылыңыз же WhatsApp аркылуу жазыңыз."; submitBtn.disabled = false; }
-      return;
+      await sheetPromise; showSuccess(); return;
     }
     const text = [`Саламатсызбы! ${CFG.groom} менен ${CFG.bride} үйлөнүү тоюна жооп 💍`, `Аты-жөнү: ${name}`, `Жооп: ${LABELS[attend]}${guests ? " · " + guests + " адам" : ""}`, wish ? `💬 ${wish}` : null].filter(Boolean).join("\n");
     showSuccess();

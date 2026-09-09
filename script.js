@@ -411,6 +411,12 @@
   }
 
   /* ---------- Суроо (RSVP) ---------- */
+  // Google Таблица (Apps Script): жоопторду таблицага жазуу / запись каждого ответа в таблицу
+  function recordSheet(payload) {
+    if (!CFG.googleScriptUrl) return Promise.resolve(false);
+    return fetch(CFG.googleScriptUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) }).then(() => true).catch(() => false);
+  }
+
   // Google Форма: жоопторду таблицага жазуу / записать ответ в таблицу Google Формы (фоново)
   function recordGoogleForm(name, answer) {
     const g = CFG.googleForm || {}; if (!g.action || !g.nameEntry || !g.answerEntry) return;
@@ -450,6 +456,8 @@
     const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
     const tgText = [`💌 Жаңы жооп / Новый ответ`, `👤 ${name}`, answerLine, wish ? `💬 ${wish}` : null, `${attend === "no" ? "#келбейм" : "#келем"} · ${guests ? guests + " адам" : ""}`.trim(), `🕒 ${stamp}`].filter(Boolean).join("\n");
     lastAnswer = { name, attend, guests, wish };
+    // Таблицага жазуу бардык учурда фондо / запись в таблицу идёт всегда, параллельно уведомлению
+    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: T.ky.labels[attend], guests, wish, lang: LANG, timestamp: new Date().toISOString(), userAgent: navigator.userAgent });
 
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = t("sending");
@@ -464,18 +472,7 @@
 
     if (CFG.googleScriptUrl) {
       submitBtn.disabled = true; note.textContent = t("sending");
-      try {
-        await fetch(CFG.googleScriptUrl, {
-          method: "POST", mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ name, rsvp: attend, rsvpLabel: T.ky.labels[attend], lang: LANG, timestamp: new Date().toISOString(), userAgent: navigator.userAgent }),
-        });
-        showSuccess();
-      } catch (err) {
-        note.textContent = t("err");
-        submitBtn.disabled = false;
-      }
-      return;
+      await sheetPromise; showSuccess(); return;
     }
     // WhatsApp аркылуу
     const text = [t("wa")(CFG.groom, CFG.bride), `${t("waName")}: ${name}`, `${t("waAnswer")}: ${t("labels")[attend]}${guests ? " · " + guests + " " + t("people") : ""}`, wish ? `💬 ${wish}` : null].filter(Boolean).join("\n");
