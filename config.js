@@ -36,7 +36,7 @@ window.WEDDING = {
   //    Заполняется по ссылке «Получить предзаполненную ссылку» из формы — README
   googleForm: { action: "", nameEntry: "", answerEntry: "" },
   // 3) Google Таблица: Google Apps Script жайгаштырып, шилтемесин коюңуз (README карагыла)
-  googleScriptUrl: "",
+  googleScriptUrl: "https://script.google.com/macros/s/AKfycbyGAkAdBElfS4XY7wDNblNHd-t4RJxo0CpSQikzc_MrNc6L_kv8IAHMdDcMbCZxj4obPA/exec",
   // 4) WhatsApp номер (өлкө коду менен, сандар гана) — гость нажимает «Отправить» в WhatsApp сам
   whatsapp: "996555000000",
 
