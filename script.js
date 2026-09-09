@@ -461,7 +461,7 @@
     const tgText = [changed ? "🔄 Жооп өзгөртүлдү" : "💌 Жаңы жооп", `👤 ${name}`, answerLine, wish ? `💬 ${wish}` : null, `🕒 ${stamp}`, attend === "no" ? "#келбейм" : "#келем"].filter(Boolean).join("\n");
     lastAnswer = { name, attend, guests, wish, sent: true };
     // Таблицага жазуу бардык учурда фондо / запись в таблицу идёт всегда, параллельно уведомлению
-    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: (changed ? "(өзгөртүлдү) " : "") + T.ky.labels[attend], guests, wish, lang: LANG, timestamp: d.toISOString(), userAgent: navigator.userAgent });
+    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: (changed ? "(өзгөртүлдү) " : "") + T.ky.labels[attend], guests, wish, timestamp: d.toISOString() });
 
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = t("sending");

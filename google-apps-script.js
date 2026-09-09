@@ -49,12 +49,10 @@ function setupSheet() {
   sheet.setColumnWidth(1, 150); sheet.setColumnWidth(2, 240); sheet.setColumnWidth(3, 220);
   sheet.setColumnWidth(4, 90); sheet.setColumnWidth(5, 340);
   sheet.setFrozenRows(1);
-  // Жыйынтык / Итоги справа (G–H)
-  sheet.getRange("G1").setValue("Келет (жооп)"); sheet.getRange("H1").setFormula('=COUNTIF(C:C,"*Келемин*")');
-  sheet.getRange("G2").setValue("Келбейт");      sheet.getRange("H2").setFormula('=COUNTIF(C:C,"*Келе албаймын*")');
-  sheet.getRange("G3").setValue("Адам саны");    sheet.getRange("H3").setFormula('=SUM(D:D)');
-  sheet.getRange("G1:G3").setFontWeight("bold");
+  // Жыйынтык / Итоги справа (G–H) — считаются скриптом после каждого ответа (формулы не нужны)
+  sheet.getRange("G1:G3").setValues([["Келет (жооп)"], ["Келбейт"], ["Адам саны"]]).setFontWeight("bold");
   sheet.setColumnWidth(7, 120);
+  updateTotals(sheet);
 }
 
 function appendAnswer(data) {
@@ -69,7 +67,23 @@ function appendAnswer(data) {
     Number(data.guests || 0),
     data.wish || "",
   ]);
+  updateTotals(sheet);
   return true;
+}
+
+/** Жыйынтыкты эсептөө / Пересчёт итогов: по столбцам «Жооп» и «Адам саны» (без формул — работает в любой локали). */
+function updateTotals(sheet) {
+  var last = sheet.getLastRow();
+  var yes = 0, no = 0, people = 0;
+  if (last > 1) {
+    var rows = sheet.getRange(2, 3, last - 1, 2).getValues();
+    for (var i = 0; i < rows.length; i++) {
+      var label = String(rows[i][0] || "");
+      if (label.indexOf("Келе албаймын") >= 0) no++;
+      else if (label.indexOf("Келемин") >= 0) { yes++; people += Number(rows[i][1]) || 0; }
+    }
+  }
+  sheet.getRange("H1:H3").setValues([[yes], [no], [people]]);
 }
 
 function getOrCreateSheet() {
