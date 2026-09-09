@@ -461,6 +461,13 @@
   if (document.fonts) document.fonts.ready.then(() => { if (!document.body.classList.contains("locked")) buildRoute(); });
 
   /* ---------- Суроо (RSVP) ---------- */
+  // Google Форма: жоопторду таблицага жазуу / записать ответ в таблицу Google Формы (фоново)
+  function recordGoogleForm(name, answer) {
+    const g = CFG.googleForm || {}; if (!g.action || !g.nameEntry || !g.answerEntry) return;
+    const body = new URLSearchParams(); body.set(g.nameEntry, name); body.set(g.answerEntry, answer);
+    try { fetch(g.action, { method: "POST", mode: "no-cors", body }).catch(() => {}); } catch (e) {}
+  }
+
   // CallMeBot аркылуу: жооп ээлердин WhatsApp'ына өзү келет / Ответ приходит хозяевам в WhatsApp автоматически
   function sendCallMeBot(text) {
     const c = CFG.callmebot || {}; if (!c.phone || !c.apikey) return false;
@@ -486,6 +493,7 @@
     if (!name) { nameField.classList.add("is-error"); form.name.focus(); return; }
     nameField.classList.remove("is-error");
     const attend = form.attend.value;
+    recordGoogleForm(name, LABELS[attend]);
     const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
     const tgText = `💌 Жаңы жооп / Новый ответ\n👤 ${name}\n✅ ${LABELS[attend]}\n🕒 ${stamp}`;
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {

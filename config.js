@@ -31,7 +31,10 @@ window.WEDDING = {
   //    (README: как за минуту получить apikey). phone — ваш номер с кодом страны, только цифры
   callmebot: { phone: "", apikey: "" },
   // 2) Telegram: ответы приходят сами (README: как получить token и chatId)
-  telegram: { token: "8780616125:AAG4XXHKsHza5yWYPjRiWolZ6DsoG9C9lk0", chatId: "939133235, -1004476720864" },   // бир же бир нече id үтүр менен: "123, 456" же группанын id
+  telegram: { token: "8780616125:AAG4XXHKsHza5yWYPjRiWolZ6DsoG9C9lk0", chatId: "-1004476720864" },   // бир же бир нече id үтүр менен: "123, 456" же группанын id
+  // Бардык жооптордун жазуусу / Запись всех ответов в Google Форму (таблица ответов в вашем Google-аккаунте).
+  //    Заполняется по ссылке «Получить предзаполненную ссылку» из формы — README
+  googleForm: { action: "", nameEntry: "", answerEntry: "" },
   // 3) Google Таблица: Google Apps Script жайгаштырып, шилтемесин коюңуз (README карагыла)
   googleScriptUrl: "",
   // 4) WhatsApp номер (өлкө коду менен, сандар гана) — гость нажимает «Отправить» в WhatsApp сам
