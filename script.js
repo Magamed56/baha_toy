@@ -492,7 +492,7 @@
   }
   function showSuccess() {
     if (window.__burst) { const r = $("#rsvp").getBoundingClientRect(); window.__burst(innerWidth / 2 * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), Math.min(innerHeight, Math.max(0, r.top + 200)) * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), 90); }
-    try { localStorage.setItem("rsvp", JSON.stringify(lastAnswer)); } catch (e) {}
+    try { localStorage.setItem("rsvp", JSON.stringify({ name: lastAnswer.name, attend: lastAnswer.attend, guests: lastAnswer.guests, wish: lastAnswer.wish })); } catch (e) {}
     renderSuccess(lastAnswer);
     form.hidden = true;
     const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");

@@ -541,7 +541,7 @@
   function syncGuests() { $("#guests-field").hidden = form.attend.value === "no"; }
   $$("input[name=attend]", form).forEach((r) => r.addEventListener("change", syncGuests)); syncGuests();
   function showSuccess() {
-    try { localStorage.setItem("rsvp", JSON.stringify(lastAnswer)); } catch (e) {}
+    try { localStorage.setItem("rsvp", JSON.stringify({ name: lastAnswer.name, attend: lastAnswer.attend, guests: lastAnswer.guests, wish: lastAnswer.wish })); } catch (e) {}
     renderSuccess(lastAnswer); submitBtn.disabled = false; note.textContent = "";
     form.hidden = true; const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
     $$(".stroke", s).forEach((p) => drawIn(p, { duration: 1200 }));
