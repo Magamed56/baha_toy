@@ -419,10 +419,11 @@
   // Telegram аркылуу: жооп ээлерине өзү келет / Ответ приходит хозяевам в Telegram автоматически
   async function sendTelegram(text) {
     const tg = CFG.telegram || {}; if (!tg.token || !tg.chatId) return false;
-    try {
-      const r = await fetch(`https://api.telegram.org/bot${tg.token}/sendMessage`, { method: "POST", body: new URLSearchParams({ chat_id: tg.chatId, text }) });
-      return r.ok;
-    } catch (e) { return false; }
+    // chatId: бир же бир нече id үтүр менен / один или несколько id через запятую, либо id группы
+    const ids = String(tg.chatId).split(/[,\s]+/).filter(Boolean);
+    const results = await Promise.all(ids.map((id) =>
+      fetch(`https://api.telegram.org/bot${tg.token}/sendMessage`, { method: "POST", body: new URLSearchParams({ chat_id: id, text }) }).then((r) => r.ok).catch(() => false)));
+    return results.some(Boolean);
   }
 
   const form = $("#rsvp-form"), note = $("#form-note"), submitBtn = $("#rsvp-submit");
