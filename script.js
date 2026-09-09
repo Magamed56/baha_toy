@@ -140,6 +140,20 @@
   $$(".section .container.reveal").forEach((c) => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("class", "divider"); s.setAttribute("viewBox", "0 0 260 28"); s.innerHTML = DIVIDER; c.insertBefore(s, c.firstChild); });
   $$(".reveal").forEach((r) => Array.from(r.children).forEach((c, i) => c.style.setProperty("--n", i)));
 
+  /* ---------- Толкундар / Волнистые границы между разделами ---------- */
+  (function waves() {
+    const TOP = { "section--invite": "var(--bg)", "section--date": "var(--bg)", "section--countdown": "#4c463f", "section--venue": "var(--bg)", "section--hosts": "var(--bg-2)", "section--notes": "var(--bg)", "section--rsvp": "var(--bg)", "footer": "#4c463f" };
+    const blocks = $$(".section, .footer");
+    const PATH = "M0 34 C 200 8, 400 60, 600 34 S 1000 8, 1200 34 S 1600 60, 1800 34 S 2200 8, 2400 34 L2400 60 L0 60 Z";
+    blocks.forEach((b, i) => {
+      const next = blocks[i + 1]; if (!next) return;
+      const key = Object.keys(TOP).find((k) => next.classList.contains(k)); const color = TOP[key] || "var(--bg)";
+      const w = document.createElement("div"); w.className = "wave";
+      w.innerHTML = `<svg class="wave--back" viewBox="0 0 2400 60" preserveAspectRatio="none" aria-hidden="true"><path d="${PATH}" style="fill:${color}" transform="translate(300 -8)"/></svg><svg class="wave--front" viewBox="0 0 2400 60" preserveAspectRatio="none" aria-hidden="true"><path d="${PATH}" style="fill:${color}"/></svg>`;
+      b.appendChild(w);
+    });
+  })();
+
   /* ---------- Параллакс, боке, наклон, волна ---------- */
   const hero = $(".hero");
   if (CFG.heroImage) { hero.style.setProperty("--hero-img", `url("${CFG.heroImage}")`); hero.classList.add("has-photo"); }

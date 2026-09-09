@@ -342,3 +342,12 @@ body.opened .hero__names::after, .is-visible .footer__names::after { animation-p
 .section--hosts .reveal:not(.is-visible) .ch { animation: none; opacity: 0; }
 
 .btn--small { padding: .7rem 1.6rem; font-size: .9rem; margin-top: 1.2rem; }
+
+/* ===== Толкундар / Волнистые границы разделов ===== */
+.wave { position: absolute; left: 0; right: 0; bottom: -1px; height: 58px; overflow: hidden; pointer-events: none; z-index: 2; }
+.wave svg { position: absolute; left: 0; bottom: 0; width: 200%; height: 100%; display: block; }
+.wave svg.wave--back { opacity: .45; animation: waveDrift 22s linear infinite reverse; }
+.wave svg.wave--front { animation: waveDrift 14s linear infinite; }
+@keyframes waveDrift { to { transform: translateX(-50%); } }
+.section, .footer { position: relative; }
+@media (prefers-reduced-motion: reduce) { .wave svg { animation: none; } }
