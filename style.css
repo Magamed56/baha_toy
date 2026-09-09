@@ -112,9 +112,11 @@ body.opened .hero .ch { animation-play-state: running; }
 
 /* Башкы экрандагы сүрөт / Фото на главном экране */
 .hero.has-photo { background: center / cover no-repeat var(--hero-img), var(--bg); }
-.hero.has-photo::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.42) 45%, rgba(248,246,244,.92) 88%, var(--bg) 100%); }
+.hero.has-photo::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,.55) 32%, rgba(255,255,255,.55) 58%, rgba(255,255,255,.15) 78%, var(--bg) 100%); }
 .hero.has-photo .hero__glow, .hero.has-photo .hero__bokeh { display: none; }
 .hero.has-photo .hero__floral { opacity: .55; }
+.hero.has-photo .hero__names::after { display: none; }
+.hero.has-photo { background-position: center 62%; }
 
 /* ---------- Музыка баскычы ---------- */
 .music-btn {
