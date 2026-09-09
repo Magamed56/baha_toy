@@ -35,7 +35,7 @@
     addressLine: [CFG.region, CFG.venueAddress].filter(Boolean).join(", "),
     inviteTitle: CFG.inviteTitle, inviteText: fill(CFG.inviteText), closingText: CFG.closingText,
   };
-  $$("[data-cfg]").forEach((el) => { const v = values[el.dataset.cfg]; if (v) el.textContent = v; });
+  $$("[data-cfg]").forEach((el) => { const v = values[el.dataset.cfg]; if (el.dataset.cfg === "addressLine") { el.textContent = v || ""; el.hidden = !v; } else if (v) el.textContent = v; });
   document.title = `${CFG.groom} & ${CFG.bride} — Үйлөнүү той`;
   $("#tr-groom").textContent = CFG.groom || "";
 

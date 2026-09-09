@@ -82,6 +82,7 @@
     $$("[data-cfg]").forEach((el) => {
       if (el.querySelector(".ch")) return; // аттар тамга-тамга бөлүнгөн / имена уже разбиты по буквам
       const v = values[el.dataset.cfg];
+      if (el.dataset.cfg === "addressLine") { el.textContent = v || ""; el.hidden = !v; return; }
       if (v !== undefined && v !== null && v !== "") el.textContent = v;
     });
     document.title = `${CFG.groom} & ${CFG.bride} — ${t("titleSuffix")}`;

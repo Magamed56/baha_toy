@@ -18,7 +18,7 @@ window.WEDDING = {
   timeEnd: "22:00",
 
   // Дарек / Адрес
-  region: "Кызыл-Жол айылы",
+  region: "",                       // айыл/шаар (бош калтырса көрсөтүлбөйт)
   venueName: "«Мезгил» багы",
   venueAddress: "",                  // ← көчө, үй (толтуруңуз)
   routeUrl: "https://2gis.kg/bishkek/geo/70030076887358653/70.809223,40.028787",         // 2GIS / Google / Яндекс шилтеме
@@ -55,7 +55,7 @@ window.WEDDING = {
 
   // Орусча тексттер / Русские тексты (для переключателя РУ/КЫ)
   ru: {
-    region: "село Кызыл-Жол",
+    region: "",
     venueName: "сад «Мезгил»",
     venueAddress: "",
     inviteTitle: "Дорогие гости!",
