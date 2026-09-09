@@ -227,14 +227,24 @@
             <label class="choice"><input type="radio" name="attend" value="both"><span data-i18n="both">Жубайым менен келемин 👫</span></label>
             <label class="choice"><input type="radio" name="attend" value="no"><span data-i18n="no">Келе албаймын 😔</span></label>
           </fieldset>
+          <label class="field" id="guests-field">
+            <span data-i18n="guestsLabel">Канча адам келесиз?</span>
+            <select name="guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+          </label>
+          <label class="field">
+            <span data-i18n="wishLabel">Каалоо (милдеттүү эмес)</span>
+            <textarea name="wish" rows="2" placeholder="Жаш үй-бүлөгө бир-эки жылуу сөз…" data-i18n-ph="wishPh" maxlength="300"></textarea>
+          </label>
           <button id="rsvp-submit" class="btn btn--gold" type="submit"><span data-i18n="submit">Жөнөтүү</span></button>
           <p class="form__note" id="form-note"></p>
         </form>
 
         <div id="rsvp-success" class="success" hidden>
           <div class="success__icon">♥</div>
-          <h3 data-i18n="thanks">Рахмат!</h3>
-          <p data-i18n-html="received">Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.</p>
+          <h3 id="thanks-title" data-i18n="thanks">Рахмат!</h3>
+          <p id="thanks-text" data-i18n-html="received">Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.</p>
+          <p class="success__answer" id="answer-echo"></p>
+          <button type="button" class="btn btn--outline btn--small" id="change-btn"><span data-i18n="change">Жоопту өзгөртүү</span></button>
         </div>
       </div>
     </section>

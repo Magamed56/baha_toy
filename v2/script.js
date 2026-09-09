@@ -493,9 +493,12 @@
     if (!name) { nameField.classList.add("is-error"); form.name.focus(); return; }
     nameField.classList.remove("is-error");
     const attend = form.attend.value;
-    recordGoogleForm(name, LABELS[attend]);
+    const guests = attend === "no" ? 0 : Number(form.guests.value || 1);
+    const wish = (form.wish.value || "").trim().slice(0, 300);
+    recordGoogleForm(name, `${LABELS[attend]}${guests ? " · " + guests : ""}${wish ? " · " + wish : ""}`);
     const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
-    const tgText = `💌 Жаңы жооп / Новый ответ\n👤 ${name}\n✅ ${LABELS[attend]}\n🕒 ${stamp}`;
+    const tgText = [`💌 Жаңы жооп / Новый ответ`, `👤 ${name}`, attend === "no" ? `❌ ${LABELS.no}` : `✅ ${LABELS[attend]} · 👥 ${guests}`, wish ? `💬 ${wish}` : null, `${attend === "no" ? "#келбейм" : "#келем"}${guests ? " · " + guests + " адам" : ""}`, `🕒 ${stamp}`].filter(Boolean).join("\n");
+    lastAnswer = { name, attend, guests, wish };
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = "Жөнөтүлүүдө…";
       if (sendCallMeBot(tgText)) { setTimeout(showSuccess, 900); return; }
@@ -515,11 +518,26 @@
       } catch (err) { note.textContent = "Ката кетти. Кайра аракет кылыңыз же WhatsApp аркылуу жазыңыз."; submitBtn.disabled = false; }
       return;
     }
-    const text = [`Саламатсызбы! ${CFG.groom} менен ${CFG.bride} үйлөнүү тоюна жооп 💍`, `Аты-жөнү: ${name}`, `Жооп: ${LABELS[attend]}`].join("\n");
+    const text = [`Саламатсызбы! ${CFG.groom} менен ${CFG.bride} үйлөнүү тоюна жооп 💍`, `Аты-жөнү: ${name}`, `Жооп: ${LABELS[attend]}${guests ? " · " + guests + " адам" : ""}`, wish ? `💬 ${wish}` : null].filter(Boolean).join("\n");
     showSuccess();
     setTimeout(() => { location.href = `https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`; }, 400);
   });
+  let lastAnswer = null;
+  function renderSuccess(a) {
+    $("#thanks-title").textContent = a && a.name ? `Рахмат, ${a.name.split(/\s+/)[0]}!` : "Рахмат!";
+    $("#thanks-text").innerHTML = a && a.attend === "no" ? "Жообуңуз кабыл алынды.<br>Кийинки жолу сөзсүз көрүшөбүз!" : "Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.";
+    $("#answer-echo").textContent = a ? `Сиздин жооп: ${LABELS[a.attend]}${a.guests ? " · " + a.guests + " адам" : ""}` : "";
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem("rsvp") || "null");
+    if (saved && saved.name) { lastAnswer = saved; renderSuccess(saved); form.hidden = true; const s0 = $("#rsvp-success"); s0.hidden = false; s0.classList.add("is-shown"); form.name.value = saved.name; }
+  } catch (e) {}
+  $("#change-btn").addEventListener("click", () => { $("#rsvp-success").hidden = true; $("#rsvp-success").classList.remove("is-shown"); form.hidden = false; form.name.focus(); setTimeout(buildRoute, 400); });
+  function syncGuests() { $("#guests-field").hidden = form.attend.value === "no"; }
+  $$("input[name=attend]", form).forEach((r) => r.addEventListener("change", syncGuests)); syncGuests();
   function showSuccess() {
+    try { localStorage.setItem("rsvp", JSON.stringify(lastAnswer)); } catch (e) {}
+    renderSuccess(lastAnswer); submitBtn.disabled = false; note.textContent = "";
     form.hidden = true; const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
     $$(".stroke", s).forEach((p) => drawIn(p, { duration: 1200 }));
     setTimeout(buildRoute, 900);

@@ -172,13 +172,23 @@
             <label class="choice"><input type="radio" name="attend" value="both"><i></i><span>Жубайым менен келемин</span></label>
             <label class="choice"><input type="radio" name="attend" value="no"><i></i><span>Келе албаймын</span></label>
           </fieldset>
+          <label class="field" id="guests-field">
+            <span>Канча адам келесиз?</span>
+            <select name="guests"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+          </label>
+          <label class="field">
+            <span>Каалоо (милдеттүү эмес)</span>
+            <textarea name="wish" rows="2" placeholder="Жаш үй-бүлөгө бир-эки жылуу сөз…" maxlength="300"></textarea>
+          </label>
           <button id="rsvp-submit" class="btn" type="submit"><span>Жөнөтүү</span></button>
           <p class="form__note" id="form-note"></p>
         </form>
         <div id="rsvp-success" class="success" hidden>
           <svg viewBox="0 0 60 60" class="success__heart" aria-hidden="true"><path class="stroke" d="M30 52 C 10 38, 4 28, 4 18 A 12 12 0 0 1 30 12 A 12 12 0 0 1 56 18 C 56 28, 50 38, 30 52 Z"/></svg>
-          <h3>Рахмат!</h3>
-          <p>Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.</p>
+          <h3 id="thanks-title">Рахмат!</h3>
+          <p id="thanks-text">Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.</p>
+          <p class="success__answer" id="answer-echo"></p>
+          <button type="button" class="btn btn--line btn--small" id="change-btn"><span>Жоопту өзгөртүү</span></button>
         </div>
       </div>
     </section>

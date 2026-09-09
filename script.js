@@ -23,7 +23,8 @@
       kNotes: "Эскертүү", notesTitle: "Маанилүү маалымат", kRsvp: "Суроо", rsvpTitle: "Тойго келесизби?", rsvpSub: "Жообуңузду алдын ала билдирип коюңуз",
       nameLabel: "Аты-жөнүңүз", namePh: "Мисалы: Айбек Асанов", nameHint: "Жубайыңыз менен келе турчу болсоңуз, анын да атын кошо жазып кетиңиз",
       yes: "Келемин 🥰", both: "Жубайым менен келемин 👫", no: "Келе албаймын 😔", submit: "Жөнөтүү", sending: "Жөнөтүлүүдө…",
-      err: "Ката кетти. Кайра аракет кылыңыз же WhatsApp аркылуу жазыңыз.", thanks: "Рахмат!", received: "Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.",
+      err: "Ката кетти. Кайра аракет кылыңыз же WhatsApp аркылуу жазыңыз.", thanks: "Рахмат!", thanksName: "Рахмат, {name}!", received: "Жообуңуз кабыл алынды.<br>Сизди тойдо күтөбүз.", receivedNo: "Жообуңуз кабыл алынды.<br>Кийинки жолу сөзсүз көрүшөбүз!",
+      guestsLabel: "Канча адам келесиз?", wishLabel: "Каалоо (милдеттүү эмес)", wishPh: "Жаш үй-бүлөгө бир-эки жылуу сөз…", change: "Жоопту өзгөртүү", yourAnswer: "Сиздин жооп", people: "адам",
       labels: { yes: "Келемин", both: "Жубайым менен келемин", no: "Келе албаймын" },
       wa: (g, b) => `Саламатсызбы! ${g} менен ${b} үйлөнүү тоюна жооп 💍`, waName: "Аты-жөнү", waAnswer: "Жооп", calTitle: (g, b) => `${g} & ${b} — үйлөнүү той`,
       months: ["январь", "февраль", "март", "апрель", "май", "июнь", "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"],
@@ -39,7 +40,8 @@
       kNotes: "Важно", notesTitle: "Полезная информация", kRsvp: "Ответ", rsvpTitle: "Вы придёте?", rsvpSub: "Пожалуйста, ответьте заранее",
       nameLabel: "Ваше имя и фамилия", namePh: "Например: Айбек Асанов", nameHint: "Если придёте с супругом(ой), укажите и его/её имя",
       yes: "Приду 🥰", both: "Приду с супругом(ой) 👫", no: "К сожалению, не смогу 😔", submit: "Отправить", sending: "Отправляем…",
-      err: "Ошибка. Попробуйте ещё раз или напишите в WhatsApp.", thanks: "Спасибо!", received: "Ваш ответ принят.<br>Ждём вас на торжестве.",
+      err: "Ошибка. Попробуйте ещё раз или напишите в WhatsApp.", thanks: "Спасибо!", thanksName: "Спасибо, {name}!", received: "Ваш ответ принят.<br>Ждём вас на торжестве.", receivedNo: "Ваш ответ принят.<br>Обязательно увидимся в другой раз!",
+      guestsLabel: "Сколько человек придёт?", wishLabel: "Пожелание (необязательно)", wishPh: "Пара тёплых слов молодой семье…", change: "Изменить ответ", yourAnswer: "Ваш ответ", people: "чел.",
       labels: { yes: "Приду", both: "Приду с супругом(ой)", no: "Не смогу" },
       wa: (g, b) => `Здравствуйте! Ответ на приглашение на свадьбу ${g} и ${b} 💍`, waName: "Имя", waAnswer: "Ответ", calTitle: (g, b) => `${g} & ${b} — свадьба`,
       months: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
@@ -441,9 +443,13 @@
     if (!name) { nameField.classList.add("is-error"); form.name.focus(); return; }
     nameField.classList.remove("is-error");
     const attend = form.attend.value;
-    recordGoogleForm(name, `${T.ky.labels[attend]} / ${T.ru.labels[attend]}`);
+    const guests = attend === "no" ? 0 : Number(form.guests.value || 1);
+    const wish = (form.wish.value || "").trim().slice(0, 300);
+    const answerLine = attend === "no" ? `❌ ${T.ky.labels.no} / ${T.ru.labels.no}` : `✅ ${T.ky.labels[attend]} / ${T.ru.labels[attend]} · 👥 ${guests}`;
+    recordGoogleForm(name, `${T.ky.labels[attend]} / ${T.ru.labels[attend]}${guests ? " · " + guests : ""}${wish ? " · " + wish : ""}`);
     const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
-    const tgText = `💌 Жаңы жооп / Новый ответ\n👤 ${name}\n✅ ${T.ky.labels[attend]} / ${T.ru.labels[attend]}\n🕒 ${stamp}`;
+    const tgText = [`💌 Жаңы жооп / Новый ответ`, `👤 ${name}`, answerLine, wish ? `💬 ${wish}` : null, `${attend === "no" ? "#келбейм" : "#келем"} · ${guests ? guests + " адам" : ""}`.trim(), `🕒 ${stamp}`].filter(Boolean).join("\n");
+    lastAnswer = { name, attend, guests, wish };
 
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = t("sending");
@@ -472,15 +478,35 @@
       return;
     }
     // WhatsApp аркылуу
-    const text = [t("wa")(CFG.groom, CFG.bride), `${t("waName")}: ${name}`, `${t("waAnswer")}: ${t("labels")[attend]}`].join("\n");
+    const text = [t("wa")(CFG.groom, CFG.bride), `${t("waName")}: ${name}`, `${t("waAnswer")}: ${t("labels")[attend]}${guests ? " · " + guests + " " + t("people") : ""}`, wish ? `💬 ${wish}` : null].filter(Boolean).join("\n");
     showSuccess();
     setTimeout(() => { location.href = `https://wa.me/${(CFG.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(text)}`; }, 400);
   });
+  let lastAnswer = null;
+  function renderSuccess(a) {
+    $("#thanks-title").textContent = a && a.name ? t("thanksName").replace("{name}", a.name.split(/\s+/)[0]) : t("thanks");
+    $("#thanks-text").innerHTML = a && a.attend === "no" ? t("receivedNo") : t("received");
+    const echo = $("#answer-echo");
+    echo.textContent = a ? `${t("yourAnswer")}: ${t("labels")[a.attend]}${a.guests ? " · " + a.guests + " " + t("people") : ""}` : "";
+  }
   function showSuccess() {
     if (window.__burst) { const r = $("#rsvp").getBoundingClientRect(); window.__burst(innerWidth / 2 * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), Math.min(innerHeight, Math.max(0, r.top + 200)) * (devicePixelRatio > 2 ? 2 : devicePixelRatio || 1), 90); }
+    try { localStorage.setItem("rsvp", JSON.stringify(lastAnswer)); } catch (e) {}
+    renderSuccess(lastAnswer);
     form.hidden = true;
     const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
+    submitBtn.disabled = false; note.textContent = "";
   }
+  // Гость мурун жооп берген болсо / Гость уже отвечал с этого телефона
+  try {
+    const saved = JSON.parse(localStorage.getItem("rsvp") || "null");
+    if (saved && saved.name) { lastAnswer = saved; renderSuccess(saved); form.hidden = true; const s = $("#rsvp-success"); s.hidden = false; s.classList.add("is-shown");
+      form.name.value = saved.name; if (form.attend) form.attend.value = saved.attend; if (saved.guests) form.guests.value = String(saved.guests); form.wish.value = saved.wish || ""; }
+  } catch (e) {}
+  $("#change-btn").addEventListener("click", () => { $("#rsvp-success").hidden = true; $("#rsvp-success").classList.remove("is-shown"); form.hidden = false; form.name.focus(); });
+  // «Келе албаймын» болсо адам санын жашырабыз / скрыть число гостей при отказе
+  function syncGuests() { $("#guests-field").hidden = form.attend.value === "no"; }
+  $$("input[name=attend]", form).forEach((r) => r.addEventListener("change", syncGuests)); syncGuests();
 
   /* ---------- Тилди алмаштыруу / Переключение языка ---------- */
   function applyLang(lang, first) {
@@ -491,7 +517,7 @@
     $$("[data-i18n-html]").forEach((el) => { el.innerHTML = t(el.dataset.i18nHtml); });
     $$("#lang button").forEach((b) => b.classList.toggle("is-active", b.dataset.lang === lang));
     if (first) return;
-    computeValues(); fillValues(); renderNotes(); buildCalendar(); calendarLink(); applyGuest();
+    computeValues(); fillValues(); renderNotes(); buildCalendar(); calendarLink(); applyGuest(); if (!$("#rsvp-success").hidden) renderSuccess(lastAnswer);
     $$(WORD_ELS).forEach(splitWords);
     if (!document.body.classList.contains("locked")) $$(".reveal.is-visible").forEach((r) => { r.classList.remove("is-visible"); void r.offsetWidth; r.classList.add("is-visible"); });
   }
