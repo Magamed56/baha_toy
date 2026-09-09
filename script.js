@@ -451,13 +451,17 @@
     const attend = form.attend.value;
     const guests = attend === "no" ? 0 : Number(form.guests.value || 1);
     const wish = (form.wish.value || "").trim().slice(0, 300);
-    const answerLine = attend === "no" ? `❌ ${T.ky.labels.no} / ${T.ru.labels.no}` : `✅ ${T.ky.labels[attend]} / ${T.ru.labels[attend]} · 👥 ${guests}`;
-    recordGoogleForm(name, `${T.ky.labels[attend]} / ${T.ru.labels[attend]}${guests ? " · " + guests : ""}${wish ? " · " + wish : ""}`);
-    const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
-    const tgText = [`💌 Жаңы жооп / Новый ответ`, `👤 ${name}`, answerLine, wish ? `💬 ${wish}` : null, `${attend === "no" ? "#келбейм" : "#келем"} · ${guests ? guests + " адам" : ""}`.trim(), `🕒 ${stamp}`].filter(Boolean).join("\n");
-    lastAnswer = { name, attend, guests, wish };
+    // Ошол эле жооп экинчи жолу жөнөтүлбөйт / тот же ответ повторно не отправляется
+    const same = lastAnswer && lastAnswer.name === name && lastAnswer.attend === attend && lastAnswer.guests === guests && lastAnswer.wish === wish;
+    if (same && lastAnswer.sent) { showSuccess(); return; }
+    const changed = !!(lastAnswer && lastAnswer.sent);
+    const answerLine = attend === "no" ? `❌ ${T.ky.labels.no}` : `✅ ${T.ky.labels[attend]} · ${guests} адам`;
+    recordGoogleForm(name, `${T.ky.labels[attend]}${guests ? " · " + guests : ""}${wish ? " · " + wish : ""}`);
+    const d = new Date(); const stamp = `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    const tgText = [changed ? "🔄 Жооп өзгөртүлдү" : "💌 Жаңы жооп", `👤 ${name}`, answerLine, wish ? `💬 ${wish}` : null, `🕒 ${stamp}`, attend === "no" ? "#келбейм" : "#келем"].filter(Boolean).join("\n");
+    lastAnswer = { name, attend, guests, wish, sent: true };
     // Таблицага жазуу бардык учурда фондо / запись в таблицу идёт всегда, параллельно уведомлению
-    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: T.ky.labels[attend], guests, wish, lang: LANG, timestamp: new Date().toISOString(), userAgent: navigator.userAgent });
+    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: (changed ? "(өзгөртүлдү) " : "") + T.ky.labels[attend], guests, wish, lang: LANG, timestamp: d.toISOString(), userAgent: navigator.userAgent });
 
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = t("sending");

@@ -501,11 +501,14 @@
     const attend = form.attend.value;
     const guests = attend === "no" ? 0 : Number(form.guests.value || 1);
     const wish = (form.wish.value || "").trim().slice(0, 300);
+    const same = lastAnswer && lastAnswer.name === name && lastAnswer.attend === attend && lastAnswer.guests === guests && lastAnswer.wish === wish;
+    if (same && lastAnswer.sent) { showSuccess(); return; }
+    const changed = !!(lastAnswer && lastAnswer.sent);
     recordGoogleForm(name, `${LABELS[attend]}${guests ? " · " + guests : ""}${wish ? " · " + wish : ""}`);
-    const stamp = new Date().toLocaleString("ru-RU", { hour12: false });
-    const tgText = [`💌 Жаңы жооп / Новый ответ`, `👤 ${name}`, attend === "no" ? `❌ ${LABELS.no}` : `✅ ${LABELS[attend]} · 👥 ${guests}`, wish ? `💬 ${wish}` : null, `${attend === "no" ? "#келбейм" : "#келем"}${guests ? " · " + guests + " адам" : ""}`, `🕒 ${stamp}`].filter(Boolean).join("\n");
-    lastAnswer = { name, attend, guests, wish };
-    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: LABELS[attend], guests, wish, lang: "ky", timestamp: new Date().toISOString(), userAgent: navigator.userAgent });
+    const d = new Date(); const stamp = `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    const tgText = [changed ? "🔄 Жооп өзгөртүлдү" : "💌 Жаңы жооп", `👤 ${name}`, attend === "no" ? `❌ ${LABELS.no}` : `✅ ${LABELS[attend]} · ${guests} адам`, wish ? `💬 ${wish}` : null, `🕒 ${stamp}`, attend === "no" ? "#келбейм" : "#келем"].filter(Boolean).join("\n");
+    lastAnswer = { name, attend, guests, wish, sent: true };
+    const sheetPromise = recordSheet({ name, rsvp: attend, rsvpLabel: (changed ? "(өзгөртүлдү) " : "") + LABELS[attend], guests, wish, lang: "ky", timestamp: d.toISOString(), userAgent: navigator.userAgent });
     if (CFG.callmebot && CFG.callmebot.phone && CFG.callmebot.apikey) {
       submitBtn.disabled = true; note.textContent = "Жөнөтүлүүдө…";
       if (sendCallMeBot(tgText)) { setTimeout(showSuccess, 900); return; }
