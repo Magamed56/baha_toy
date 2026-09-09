@@ -1,6 +1,6 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//ernis_toy//KG
+PRODID:-//baha_toy//KG
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
@@ -10,8 +10,8 @@ DTSTART:20260926T110000Z
 DTEND:20260926T160000Z
 SUMMARY:Бактыяр & Диана — үйлөнүү той
 LOCATION:«Мезгил» багы
-DESCRIPTION:Чакыруу: https://magamed56.github.io/ernis_toy/
-URL:https://magamed56.github.io/ernis_toy/
+DESCRIPTION:Чакыруу: https://magamed56.github.io/baha_toy/
+URL:https://magamed56.github.io/baha_toy/
 BEGIN:VALARM
 TRIGGER:-P1D
 ACTION:DISPLAY

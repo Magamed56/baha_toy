@@ -41,7 +41,7 @@
 ## Персональные ссылки
 
 Добавьте к адресу `?g=Имя`, и на главном экране появится обращение «Урматтуу Имя!»,
-а имя подставится в форму ответа. Пример: `https://magamed56.github.io/ernis_toy/?g=Асан%20жана%20Айгүл`.
+а имя подставится в форму ответа. Пример: `https://magamed56.github.io/baha_toy/?g=Асан%20жана%20Айгүл`.
 При отправке ссылки в WhatsApp показывается превью `assets/og.png` с именами и датой.
 
 ## Календарь
@@ -93,7 +93,7 @@ apikey позволяет только присылать сообщения н�
 
 ## Публикация на GitHub Pages
 
-Сайт живёт по адресу https://magamed56.github.io/ernis_toy/ (версия 2: https://magamed56.github.io/ernis_toy/v2/).
+Сайт живёт по адресу https://magamed56.github.io/baha_toy/ (версия 2: https://magamed56.github.io/baha_toy/v2/).
 
 GitHub Pages раздаёт ветку `gh-pages`. Workflow `.github/workflows/deploy.yml`
 при каждом пуше в `main` копирует её в `gh-pages`, поэтому достаточно править
