@@ -5,21 +5,26 @@
  * Орнотуу / Установка:
  *  1. Создайте новую Google Таблицу.
  *  2. Расширения → Apps Script. Удалите всё и вставьте этот файл. Сохраните (иконка дискеты).
- *  3. Развернуть → Новое развёртывание → Тип: «Веб-приложение».
- *     Выполнять от имени: «Я». У кого есть доступ: «Все». Нажмите «Развернуть», разрешите доступ.
- *  4. Скопируйте URL веб-приложения (…/exec) и вставьте в config.js → googleScriptUrl.
+ *  3. Выберите функцию setupSheet и нажмите «Выполнить» (разрешите доступ) — появится лист «Жооптор».
+ *  4. Развернуть → Новое развёртывание → Тип: «Веб-приложение».
+ *     Выполнять от имени: «Я». У кого есть доступ: «Все». Нажмите «Развернуть».
+ *  5. Скопируйте URL веб-приложения (…/exec) и вставьте в config.js → googleScriptUrl.
+ *
+ * Код өзгөртүлсө / После изменения кода: Развернуть → Управление развёртываниями → ✏️ → Версия: Новая версия → Развернуть.
  */
 var SHEET_NAME = "Жооптор";
 // ID таблицы из её ссылки: docs.google.com/spreadsheets/d/<ID>/edit
 // Если указан — ответы пишутся именно в неё, даже если скрипт создан не из этой таблицы.
 var SPREADSHEET_ID = "1cMgyeopLUmw8bwoLR8gZKFWAShEg2fTIrmcasLcVoMg";
 
+var HEADERS = ["Убакыт", "Аты-жөнү", "Жооп", "Адам саны", "Каалоо"];
+
 function doPost(e) {
   try {
     var raw = e && e.postData && e.postData.contents;
     var data = raw ? JSON.parse(raw) : (e && e.parameter) || {};
-    appendAnswer(data);
-    return ContentService.createTextOutput(JSON.stringify({ success: true })).setMimeType(ContentService.MimeType.JSON);
+    var ok = appendAnswer(data);
+    return ContentService.createTextOutput(JSON.stringify({ success: ok })).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ success: false, message: String(err) })).setMimeType(ContentService.MimeType.JSON);
   }
@@ -31,21 +36,40 @@ function doGet() {
 
 /** Текшерүү / Проверка: выберите эту функцию в редакторе и нажмите «Выполнить» — в таблице появится тестовая строка. */
 function testAppend() {
-  appendAnswer({ name: "Тест (редактордон)", rsvp: "yes", guests: 2, wish: "Текшерүү", lang: "ky", timestamp: new Date().toISOString(), userAgent: "Apps Script editor" });
+  appendAnswer({ name: "Тест (редактордон)", rsvp: "yes", guests: 2, wish: "Текшерүү", timestamp: new Date().toISOString() });
+}
+
+/** Баракты даярдоо / Подготовка листа: заголовки, ширина колонок, итоги. Можно запускать повторно — данные не трогает. */
+function setupSheet() {
+  var sheet = getOrCreateSheet();
+  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
+    .setFontWeight("bold").setBackground("#4C463F").setFontColor("#FAF9F7");
+  // Эски колонкалар (Код, Тил, Түзмөк) жана эски жыйынтык / старые колонки и старые итоги — очищаем
+  sheet.getRange("F1:K" + Math.max(sheet.getLastRow(), 3)).clear();
+  sheet.setColumnWidth(1, 150); sheet.setColumnWidth(2, 240); sheet.setColumnWidth(3, 220);
+  sheet.setColumnWidth(4, 90); sheet.setColumnWidth(5, 340);
+  sheet.setFrozenRows(1);
+  // Жыйынтык / Итоги справа (G–H)
+  sheet.getRange("G1").setValue("Келет (жооп)"); sheet.getRange("H1").setFormula('=COUNTIF(C:C,"*Келемин*")');
+  sheet.getRange("G2").setValue("Келбейт");      sheet.getRange("H2").setFormula('=COUNTIF(C:C,"*Келе албаймын*")');
+  sheet.getRange("G3").setValue("Адам саны");    sheet.getRange("H3").setFormula('=SUM(D:D)');
+  sheet.getRange("G1:G3").setFontWeight("bold");
+  sheet.setColumnWidth(7, 120);
 }
 
 function appendAnswer(data) {
+  var name = String(data.name || "").trim();
+  var code = String(data.rsvp || "").trim();
+  if (!name && !code) return false;               // бош суроо / пустой запрос — не записываем
   var sheet = getOrCreateSheet();
   sheet.appendRow([
-      new Date(data.timestamp || Date.now()),
-      data.name || "",
-      data.rsvpLabel || getLabel(data.rsvp),
-      Number(data.guests || 0),
-      data.wish || "",
-      data.rsvp || "",
-      data.lang || "",
-      data.userAgent || "",
+    new Date(data.timestamp || Date.now()),
+    name,
+    data.rsvpLabel || getLabel(code),
+    Number(data.guests || 0),
+    data.wish || "",
   ]);
+  return true;
 }
 
 function getOrCreateSheet() {
@@ -53,17 +77,8 @@ function getOrCreateSheet() {
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    var headers = ["Убакыт", "Аты-жөнү", "Жооп", "Адам саны", "Каалоо", "Код", "Тил", "Түзмөк"];
-    sheet.appendRow(headers);
-    var h = sheet.getRange(1, 1, 1, headers.length);
-    h.setFontWeight("bold").setBackground("#4C463F").setFontColor("#FAF9F7");
-    sheet.setColumnWidth(1, 170); sheet.setColumnWidth(2, 240); sheet.setColumnWidth(3, 200); sheet.setColumnWidth(5, 320);
-    sheet.setFrozenRows(1);
-    // Жыйынтык / Итоги справа
-    sheet.getRange("J1").setValue("Келет (жооп)"); sheet.getRange("K1").setFormula('=COUNTIF(F:F,"yes")+COUNTIF(F:F,"both")');
-    sheet.getRange("J2").setValue("Келбейт"); sheet.getRange("K2").setFormula('=COUNTIF(F:F,"no")');
-    sheet.getRange("J3").setValue("Адам саны"); sheet.getRange("K3").setFormula('=SUM(D:D)');
-    sheet.getRange("J1:J3").setFontWeight("bold");
+    sheet.appendRow(HEADERS);
+    setupSheet();
   }
   return sheet;
 }
